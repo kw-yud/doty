@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [[ -z $(podman ps -aq) ]]; then
+    echo "No running containers found."
+    exit 0
+fi
+
+podman stop $(podman ps -aq)
+podman rm $(podman ps -aq)

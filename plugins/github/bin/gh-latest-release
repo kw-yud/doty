@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+[[ -z "${GITHUB_PERSONAL_TOKEN_RO}" ]] && echo "ERROR: missing env variables GITHUB_PERSONAL_TOKEN_RO" && exit 2
+
+#: usage: gh_latest_release "repo/name"
+if [ ! -z ${1} ]; then
+  # Get latest release from GitHub api
+  curl -L \
+      --silent \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer ${GITHUB_PERSONAL_TOKEN_RO}"\
+      "https://api.github.com/repos/${1}/releases/latest" | jq --exit-status -r '.tag_name'
+else
+  echo "Missing required <repository> argument"
+fi

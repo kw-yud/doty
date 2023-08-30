@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+podman rmi -f $(podman image ls --filter "dangling=true" --format "{{.ID}}")

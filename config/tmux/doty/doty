@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+set -x
+
+CURRENT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+
+# [tmux] load scripts in ~/.tmux on creating a new pane
+# load order: __before__.sh, ${session_name}.sh, __after__.sh
+function doty_tmux_load_startup_scripts() {
+    tmux set-environment -g DOTY_TMUX_DIRECTORY "${CURRENT_DIR}"
+    tmux set-environment -g DOTY_TMUX_CONF "${CURRENT_DIR}/tmux.conf"
+    tmux set-environment -g DOTY_TMUX_KEYMAP_CONF "${CURRENT_DIR}/keymap.conf"
+    tmux set-environment -g DOTY_TMUX_THEME_CONF "${CURRENT_DIR}/theme.conf"
+
+    tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "${DOTY_DIRECTORY}/config/tmux/plugins/"
+
+    tmux set-environment -g TMUX_TERM "${DOTY_TMUX_TERM}"
+
+
+    local env_before_script="${DOTY_DEVELOPMENT_DIRECTORY}/tmux/__before__.sh"
+    [[ -f "${env_before_script}" ]] && { . "${env_before_script}"; }
+    local env_main_script="${DOTY_DEVELOPMENT_DIRECTORY}/tmux/$(tmux display-message -p '#{session_name}').sh"
+    [[ -f "${env_main_script}" ]] && { . "${env_main_script}"; }
+    local env_after_script="${DOTY_DEVELOPMENT_DIRECTORY}/tmux/__after__.sh"
+    [[ -f "${env_after_script}" ]] && { . "${env_after_script}"; }
+
+    tmux source "${CURRENT_DIR}/tmux.conf"
+    tmux source "${CURRENT_DIR}/keymap.conf"
+    tmux source "${CURRENT_DIR}/theme.conf"
+
+    tmux run -b "cat ${CURRENT_DIR}/theme | sh -s _apply_configuration"
+
+    # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+    tmux run -b "${DOTY_DIRECTORY}/config/tmux/tpm/tpm"
+}
+
+main() {
+    doty_tmux_load_startup_scripts >/dev/null 2>&1
+}
+
+main

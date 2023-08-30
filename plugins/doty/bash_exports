@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# NC='\033[0m' # No Color
+# BLACK='\033[0;30m'
+# BLUE='\033[0;34m'
+# BROWN='\033[0;33m'
+# CYAN='\033[0;36m'
+# DARKGRAY='\033[1;30m'
+# GREEN='\033[0;32m'
+# LIGHTBLUE='\033[1;34m'
+# LIGHTCYAN='\033[1;36m'
+# LIGHTGRAY='\033[0;37m'
+# LIGHTGREEN='\033[1;32m'
+# LIGHTPURPLE='\033[1;35m'
+# LIGHTRED='\033[1;31m'
+# PURPLE='\033[0;35m'
+# RED='\033[0;31m'
+# WHITE='\033[1;37m'
+# YELLOW='\033[1;33m'
+
+export TERM=xterm-256color
+
+# Add `~/.local/bin` to the `$PATH`
+# affix colons on either side of $PATH to simplify matching
+case ":${PATH}:" in
+    *:"${HOME}/.local/bin":*)
+        ;;
+    *)
+        export PATH="${HOME}/.local/bin:${PATH}"
+        ;;
+esac
+
+# GNU "sed" has been installed as "gsed".
+# If you need to use it as "sed", you can add a "gnubin" directory
+# to your PATH from your bashrc like:
+case ":${PATH}:" in
+    *:"$(brew --prefix gnu-sed)/libexec/gnubin":*)
+        ;;
+    *)
+        export PATH="$(brew --prefix gnu-sed)/libexec/gnubin:${PATH}"
+        ;;
+esac
+
+# Make vim the default editor.
+export EDITOR='vim';
+
+# Increase Bash history size. Allow 32³ entries; the default is 500.
+# export HISTSIZE='32768';
+# Decrease Bash history size. the default is 500.
+export HISTSIZE='50';
+export HISTFILESIZE="${HISTSIZE}";
+# Omit duplicates and commands that begin with a space from history.
+export HISTCONTROL='ignoreboth';
+
+# Prefer US English and use UTF-8.
+export LANG='en_US.UTF-8';
+export LC_ALL='en_US.UTF-8';
+
+# Adjust the less highlight colors
+export LESS="-RS"
+# Highlight section titles in manual pages.
+export LESS_TERMCAP_md="${yellow}";
+export LESS_TERMCAP_so="$(printf 'rev\nbold\nsetaf 3\n' | tput -S)"
+export LESS_TERMCAP_se="$(tput sgr0)"
+
+# Don't clear the screen after quitting a manual page.
+# export MANPAGER='less -X';
+
+# Enable gcc colours, available since gcc 4.8.0
+export GCC_COLORS=1
+
+# Avoid issues with `gpg` as installed via Homebrew.
+# https://stackoverflow.com/a/42265848/96656
+export GPG_TTY=$(tty);
+
+# Hide the "default interactive shell is now zsh" warning on macOS.
+export BASH_SILENCE_DEPRECATION_WARNING=1;
+
+# Make new shells get the history lines from all previous
+# shells instead of the default "last window closed" history
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"

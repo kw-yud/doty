@@ -1,0 +1,39 @@
+[submodule "oh-my-zsh"]
+	path = libraries/oh-my-zsh
+	url = git@github.com:ohmyzsh/ohmyzsh.git
+[submodule "vim-colors-solarized"]
+	path = config/vim/bundle/vim-colors-solarized
+	url = git@github.com:altercation/vim-colors-solarized.git
+[submodule "nvim"]
+	path = config/nvim
+	url = git@github.com:NvChad/NvChad.git
+[submodule "solarized"]
+	path = config/solarized
+	url = git@github.com:altercation/solarized.git
+[submodule "color-schemes"]
+	path = config/color-schemes
+	url = git@github.com:mbadolato/iTerm2-Color-Schemes.git
+[submodule "tmux-tpm"]
+	path = config/tmux/tpm
+	url = git@github.com:tmux-plugins/tpm.git
+[submodule "tmux-sidebar"]
+	path = config/tmux/plugins/tmux-sidebar
+	url = git@github.com:tmux-plugins/tmux-sidebar.git
+[submodule "tmux-prefix-highlight"]
+	path = config/tmux/plugins/tmux-prefix-highlight
+	url = git@github.com:tmux-plugins/tmux-prefix-highlight.git
+[submodule "tmux-net-speed"]
+	path = config/tmux/plugins/tmux-net-speed
+	url = git@github.com:tmux-plugins/tmux-net-speed.git
+[submodule "tmux-online-status"]
+	path = config/tmux/plugins/tmux-online-status
+	url = git@github.com:tmux-plugins/tmux-online-status.git
+[submodule "tmux-fpp"]
+	path = config/tmux/plugins/tmux-fpp
+	url = git@github.com:tmux-plugins/tmux-fpp.git
+[submodule "tmux-copycat"]
+	path = config/tmux/plugins/tmux-copycat
+	url = git@github.com:tmux-plugins/tmux-copycat.git
+[submodule "tmux-battery"]
+	path = config/tmux/plugins/tmux-battery
+	url = git@github.com:tmux-plugins/tmux-battery.git

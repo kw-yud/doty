@@ -1,0 +1,10 @@
+# Plugins **with support** can read the versions files used by other version managers,
+# for example, `.ruby-version` in the case of Ruby's `rbenv`.
+legacy_version_file=yes
+
+# Configure the `asdf update` command to upgrade to the latest Release Candidate instead of the latest Semantic Version.
+use_release_candidates=no
+
+# Configure the `asdf install` command to keep or delete the source code or binary it downloads.
+# no: Delete source code or binary after successful install
+always_keep_download=no

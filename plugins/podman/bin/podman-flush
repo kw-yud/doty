@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+podman-clear
+podman network prune -f
+
+imgs=$(podman images --filter dangling=true -qa)
+[ ! -z "$imgs" ] && podman rmi -f "$imgs" || echo "no dangling images."
+
+volumes=$(podman volume ls --filter dangling=true -q)
+[ ! -z "$volumes" ] && podman volume rm "$volumes" || echo "no dangling volumes."
+
+# imgs=$(podman images -qa)
+# [ ! -z "$imgs" ] && podman rmi -f "$imgs" || echo "no images."
