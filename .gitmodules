@@ -4,9 +4,6 @@
 [submodule "vim-colors-solarized"]
 	path = config/vim/bundle/vim-colors-solarized
 	url = git@github.com:altercation/vim-colors-solarized.git
-[submodule "nvim"]
-	path = config/nvim
-	url = git@github.com:NvChad/NvChad.git
 [submodule "solarized"]
 	path = config/solarized
 	url = git@github.com:altercation/solarized.git
