@@ -20,4 +20,4 @@ esac
 
 
 # [[ -d "${HOME}/.sdkman" ]] && export SDKMAN_DIR="$HOME/.sdkman"
-# [[ -f "${HOME}/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+[[ -f "${HOME}/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"

@@ -20,3 +20,5 @@ fi
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING="UTF-8";
+
+source "$ZSH/plugins/python/python.plugin.zsh"

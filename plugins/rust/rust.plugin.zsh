@@ -22,3 +22,5 @@ case ":${PATH}:" in
         export PATH="${CARGO_HOME}/bin:${PATH}"
         ;;
 esac
+
+source "$ZSH/plugins/rust/rust.plugin.zsh"

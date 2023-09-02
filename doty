@@ -35,22 +35,32 @@ if [[ -z $plugins ]]; then
         command-not-found
         copyfile
         copypath
+        dotenv
+        emoji
+        emotty
         extract
+        fd
         git
         git-extras
         # git-prompt
         gitignore
-        golang
         history
         jsontools
         kubectl
-        kubectx
-        macos
-        minikube
+        last-working-dir
+        nodenv
+        npm
+        nvm
         pre-commit
+        # pip
+        # pyenv
+        # pylint
+        ripgrep
+        sdk
         thefuck
         # themes
         urltools
+        vscode
         z
         ### Local
         android
@@ -59,6 +69,7 @@ if [[ -z $plugins ]]; then
         fzf
         github
         golang
+        kubectx
         macos
         minikube
         nodejs
@@ -92,6 +103,8 @@ export ZSH_CACHE_DIR="${DOTY_DEVELOPMENT_CACHE_DIRECTORY}/oh-my-zsh"
 export ZSH_CUSTOM="${DOTY_DIRECTORY}"
 
 export ZSHZ_DATA="${DOTY_DEVELOPMENT_CACHE_DIRECTORY}/z/.z"
+
+export ZSH_DOTENV_FILE=".envrc"
 
 # Uncomment one of the following lines to change the auto-update behavior
 # zstyle ':omz:update' mode disabled  # disable automatic updates

@@ -4,8 +4,6 @@
 0="${${ZERO:-${0:#$ZSH_ARGZERO}}:-${(%):-%N}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
 
-source "${0:h}/temp"
-
 # Load the shell dotfiles, and then some:
 [[ -f "${0:h}/path" ]] && source "${0:h}/path"
 # [[ -f "${0:h}/bash_prompt" ]] && source "${0:h}/bash_prompt"

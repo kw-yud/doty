@@ -6,4 +6,3 @@ if [[ -x "$(command -v minikube)" ]]; then
 fi
 
 source "$ZSH/plugins/minikube/minikube.plugin.zsh"
-

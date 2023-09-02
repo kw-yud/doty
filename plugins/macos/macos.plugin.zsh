@@ -80,3 +80,5 @@ complete -W "NSGlobalDomain" defaults;
 complete -o "nospace" -W "Contacts Calendar Dock Finder Mail Safari iTunes SystemUIServer Terminal Twitter" killall;
 
 source "${0:h}/config"
+
+source "$ZSH/plugins/macos/macos.plugin.zsh"

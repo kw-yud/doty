@@ -9,10 +9,9 @@ if [[ $PMSPEC != *b* ]] {
 }
 
 # alias to docker, run podman commands as docker
-#if ! type "docker" > /dev/null; then
-#  alias docker=podman
-#  alias docker-compose=podman-compose
-#fi
+if ! type "docker" > /dev/null; then
+  alias docker=podman
+  alias docker-compose=podman-compose
+fi
 
 [[ -f "${0:h}/aliases" ]] && source "${0:h}/aliases"
-
