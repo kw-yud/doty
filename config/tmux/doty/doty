@@ -12,6 +12,9 @@ function doty_tmux_load_startup_scripts() {
     tmux set-environment -g DOTY_TMUX_KEYMAP_CONF "${CURRENT_DIR}/keymap.conf"
     tmux set-environment -g DOTY_TMUX_THEME_CONF "${CURRENT_DIR}/theme.conf"
 
+    command -v random_emoji > /dev/null && tmux set-environment -g KUBE_TMUX_SYMBOL_EMOJI "$(random_emoji)"
+    command -v emotty > /dev/null && tmux set-environment -g KUBE_TMUX_SYMBOL_EMOJI "$(emotty)"
+
     tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "${DOTY_DIRECTORY}/config/tmux/plugins/"
 
     tmux set-environment -g TMUX_TERM "${DOTY_TMUX_TERM}"
