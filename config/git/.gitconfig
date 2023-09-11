@@ -117,12 +117,12 @@
     browse = !bash -c 'git fetch $1 ${2:-HEAD} && git checkout FETCH_HEAD' -
 
 	# View abbreviated SHA, description, and history graph of the latest 20 commits.
-	l = log --pretty=oneline -n 20 --graph --abbrev-commit
-	ll = log --oneline
-	last = log -1 HEAD --stat
+	l = log --date=format-local:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(yellow bold)%h%Creset%C(auto)%d%Creset - %s %C(cyan)%ad%Creset %C(green)%cn <%ce>%Creset %C(dim blue)(%cr)%Creset' --abbrev-commit -30
 	gr = log --graph --decorate --oneline
 	lg = log --graph --all --topo-order --date=format-local:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(yellow bold)%h%Creset%C(auto)%d%Creset - %s %C(cyan)%ad%Creset %C(green)%cn <%ce>%Creset %C(dim blue)(%cr)%Creset'
-	lp = log --date=format-local:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(yellow bold)%h%Creset%C(auto)%d%Creset - %s %C(cyan)%ad%Creset %C(green)%cn <%ce>%Creset %C(dim blue)(%cr)%Creset' --abbrev-commit -30
+	ll = log --oneline
+	lp = log --pretty=oneline -n 20 --graph --abbrev-commit
+	last = log -1 HEAD --stat
     # Diffstat log
     lgst = log --stat
     # Short format diffstat log
@@ -169,7 +169,7 @@
 	branches = branch --all
 	br = branch --sort=-committerdate --format='%(HEAD) %(color:yellow bold)%(refname:short)%(color:reset) | %(color:green)%(objectname:short)%(color:reset) - %(contents:subject) %(color:cyan)%(committerdate:iso)%(color:reset) %(color:green)%(authorname)%(color:reset) %(color:dim blue)(%(committerdate:relative))%(color:reset)'
 	# Remove branch
-	rm = branch -D
+	del = branch -D
 	# Remove branches that have already been merged with main.
 	# a.k.a. ‘delete merged’
 	dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
