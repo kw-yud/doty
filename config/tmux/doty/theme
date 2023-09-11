@@ -110,6 +110,19 @@ _toggle_mouse() {
   tmux set -g mouse $new
 }
 
+# see https://github.com/chubin/wttr.in#one-line-output
+weather() {
+  # /!\ make sure curl is installed
+  curl -f -s -m 2 'wttr.in?format=3' || printf '\n'
+
+  # sleep for 15 minutes, throttle network requests whatever the value of status-interval
+  sleep 900
+}
+
+online() {
+  ping -c 1 "1.1.1.1" >/dev/null 2>&1 && printf '✔' || printf '✘'
+}
+
 _battery_info() {
   count=0
   charge=0
