@@ -173,7 +173,8 @@
     # Remove branches that have already been merged with main.
     # a.k.a. ‘delete merged’
     dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
-
+    # Returns the parent branch
+    parent = "!git show-branch --current | sed \"s/].*//\" | grep \"\\*\"| grep -v \"$(git rev-parse --abbrev-ref HEAD)\" | head -n1 | sed \"s/^.*\\[//\""
     remotes = remote --verbose
     rv = remote --verbose
 
