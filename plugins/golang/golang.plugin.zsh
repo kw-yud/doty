@@ -18,17 +18,34 @@ function __init_gvm() {
 
 # source "$ZSH/plugins/golang/golang.plugin.zsh"
 
+function go-tools-install() {
+    go install github.com/cweill/gotests/gotests@latest
+    go install mvdan.cc/gofumpt@latest
+    go install github.com/segmentio/golines@latest
+    go install golang.org/x/tools/cmd/goimports@latest
+    go install golang.org/x/tools/refactor/rename@latest
+    go install github.com/fatih/gomodifytags@latest
+    go install gotest.tools/gotestsum@latest
+    go install golang.org/x/vuln/cmd/govulncheck@latest
+}
+
 function gvm-use() {
     gvm use ${@}
     __init_gvm
 }
 
-function gvm-reinstall() {
+function gvm-uninstall () {
     local CURRENT_VERSION=$(go version | awk '{print $3}')
-
     go clean -modcache
     gvm use system
     gvm uninstall $CURRENT_VERSION
+    echo "Go uninstall $CURRENT_VERSION"
+}
+
+function gvm-reinstall() {
+    local CURRENT_VERSION=$(go version | awk '{print $3}')
+
+    gvm-uninstall $CURRENT_VERSION
     gvm install $CURRENT_VERSION
     gvm use $CURRENT_VERSION
 
