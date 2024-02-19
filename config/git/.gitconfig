@@ -112,6 +112,10 @@
     trim = !git remote prune origin && git gc
     cleanup = !git clean -df && git stash clear
 
+    f = fetch
+    fo = fetch origin
+    fu = fetch upstream
+
     # Fetch a repository ($1) and checkout its ref ($2) HEAD
     # Use: `git browse https://github.com/necolas/dotfiles <commit-ish>`
     browse = !bash -c 'git fetch $1 ${2:-HEAD} && git checkout FETCH_HEAD' -
@@ -157,6 +161,10 @@
     # Credit an author on the latest commit.
     credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
 
+    cp = cherry-pick
+    cpa = cherry-pick --abort
+    cpc = cherry-pick --continue
+
     # Switch to a branch, creating it if necessary.
     go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
 
@@ -175,6 +183,7 @@
     dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
     # Returns the parent branch
     parent = "!git show-branch --current | sed \"s/].*//\" | grep \"\\*\"| grep -v \"$(git rev-parse --abbrev-ref HEAD)\" | head -n1 | sed \"s/^.*\\[//\""
+    # checkpoint = "!git log --oneline --all --parents --pretty='%d: %h' | grep \"^[^\\:]\" | sed \"s/.*\\,\\s//\" | sed \"s/)//\" | grep \"^[0-9a-z]\" | grep \"$(git parent)\" | sed \"s/$(git parent)\: //\" | tail"
     remotes = remote --verbose
     rv = remote --verbose
 
@@ -195,6 +204,19 @@
     fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
     # Find commits by commit message
     fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+
+    p = push
+    pf = push -f
+    pu = push -u
+    pt = push --tags
+
+    po = push origin
+    pfo = push -f origin
+    puo = push -u origin
+    pto = push --tags origin
+
+    pl = pull
+    pb = pull --rebase
 
     # Find out who is currently active on the repository
     # Displays committers in descending order of number of commits
