@@ -51,8 +51,8 @@ if [[ -z $plugins ]]; then
         nodenv
         npm
         nvm
-        pre-commit
         # pip
+        pre-commit
         # pyenv
         # pylint
         ripgrep
@@ -62,6 +62,7 @@ if [[ -z $plugins ]]; then
         urltools
         vscode
         z
+
         ### Local
         android
         asdf
