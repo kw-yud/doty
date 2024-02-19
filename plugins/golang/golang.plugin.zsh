@@ -23,10 +23,11 @@ function go-tools-install() {
     go install mvdan.cc/gofumpt@latest
     go install github.com/segmentio/golines@latest
     go install golang.org/x/tools/cmd/goimports@latest
-    go install golang.org/x/tools/refactor/rename@latest
+    # go install golang.org/x/tools/refactor/rename@latest
     go install github.com/fatih/gomodifytags@latest
     go install gotest.tools/gotestsum@latest
     go install golang.org/x/vuln/cmd/govulncheck@latest
+    go install github.com/twpayne/go-jsonstruct/v2/cmd/gojsonstruct@latest
 }
 
 function gvm-use() {
@@ -39,6 +40,10 @@ function gvm-uninstall () {
     go clean -modcache
     gvm use system
     gvm uninstall $CURRENT_VERSION
+
+    __init_gvm
+    go-tools-install
+
     echo "Go uninstall $CURRENT_VERSION"
 }
 
@@ -48,6 +53,9 @@ function gvm-reinstall() {
     gvm-uninstall $CURRENT_VERSION
     gvm install $CURRENT_VERSION
     gvm use $CURRENT_VERSION
+
+    __init_gvm
+    go-tools-install
 
     echo "Go re-install $CURRENT_VERSION"
 }
@@ -65,6 +73,9 @@ function gvm-update() {
     gvm install $LATEST_VERSION
     gvm use $LATEST_VERSION
     gvm uninstall $CURRENT_VERSION
+
+    __init_gvm
+    go-tools-install
 
     echo "Go updated from $CURRENT_VERSION to $LATEST_VERSION"
 }
