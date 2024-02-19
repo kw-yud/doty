@@ -739,4 +739,4 @@ hs_err_pid*
 .complimentary/*
 # .tmux/plugins/*
 # .tmux/resurrect/*
-
+/.backups/
