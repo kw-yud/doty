@@ -81,6 +81,7 @@ opt.laststatus = 3 -- Set global statusline
 opt.scrolloff = 5 -- Minimal number of screen lines to keep above and below the cursor
 opt.sidescrolloff = 5 -- The minimal number of screen columns to keep to the left and to the right of the cursor if 'nowrap' is set.
 opt.wrap = false
+opt.whichwrap = 'b,s,<,>,[,]'
 -- opt.guicursor="n-v-c:ver25,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 
 -- mouse

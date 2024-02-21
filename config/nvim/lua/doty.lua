@@ -8,6 +8,7 @@ if not vim.loop.fs_stat(semverpath) then
         semverpath
     })
 end
+
 vim.opt.rtp:prepend(semverpath)
 
 -- Setup options that I expect to be always available.

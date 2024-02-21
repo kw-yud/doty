@@ -104,10 +104,37 @@ M.symbols = {
 
 M.treesitter = {
     languages = {
-        "bash", "go", "html", "json", "markdown", "markdown_inline", "python",
-        "query", "regex", "rust", "yaml", "tsx", "vim", "vimdoc"
+        "bash",
+        "c", "cmake", "comment", "csv",
+        "dockerfile",
+        "git_config", "git_rebase", "gitattributes", "gitcommit", "gitignore",
+        "go", "gomod", "gosum", "gowork",
+        "html",
+        "ini", "jq", "json", "json5",
+        "lua", "luadoc",
+        "make", "markdown", "markdown_inline",
+        "proto",
+        "python",
+        "query", "regex",
+        "rust",
+        "sql",
+        "toml", "todotxt",
+        "typescript", "tsx",
+        "vim", "vimdoc",
+        "yaml",
     },
-    comments = {c = "// %s", go = "// %s", lua = "-- %s"}
+    comments = {c = "// %s", go = "// %s", lua = "-- %s"},
+    indent = {
+        enable = true,
+    },
+    highlight = {
+        enable = true,
+        -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+        -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+        -- Using this option may slow down your editor, and you may see some duplicate highlights.
+        -- Instead of true it can also be a list of languages
+        additional_vim_regex_highlighting = false,
+    },
 }
 
 M.colors = {
