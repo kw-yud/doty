@@ -68,30 +68,28 @@ neogit.setup {
     },
     -- Setting any section to `false` will make the section not render at all
     sections = {
-        untracked = {folded = false},
-        unstaged = {folded = false},
-        staged = {folded = false},
-        stashes = {folded = true},
-        unpulled = {folded = true},
-        unmerged = {folded = false},
-        recent = {folded = true}
+        untracked = {hidden = false},
+        unstaged = {hidden = false},
+        staged = {hidden = false},
+        stashes = {hidden = true},
+        unpulled = {folded = true, hidden = false},
+        unmerged = {folded = false, hidden = false},
+        recent = {hidden = true}
     },
     -- override/add mappings
     mappings = {
         -- modify status buffer mappings
         status = {
             -- Adds a mapping with "B" as key that does the "BranchPopup" command
-            ["B"] = "BranchPopup",
+            -- ["B"] = "BranchPopup",
             -- Removes the default mapping of "s"
-            ["s"] = "",
-            ...
+            ["s"] = false,
         },
         -- Modify fuzzy-finder buffer mappings
-        finder = {
-            -- Binds <cr> to trigger select action
-            ["<cr>"] = "select",
-            ...
-        }
+        -- finder = {
+        --     -- Binds <cr> to trigger select action
+        --     ["<cr>"] = "select",
+        -- }
     }
 }
 
