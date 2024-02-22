@@ -47,9 +47,10 @@ function doty_tmux_load_startup_scripts() {
     tmux source "${CURRENT_DIR}/keymap.conf"
     tmux source "${CURRENT_DIR}/theme.conf"
 
-    tmux run -b "cat ${CURRENT_DIR}/theme | sh -s _apply_configuration"
+    tmux run -b "cat \${DOTY_TMUX_THEME} | sh -s _apply_configuration"
 
     # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+    tmux set-option -g '@tpm-path' "${DOTY_DIRECTORY}/config/tmux/tpm"
     tmux run -b "${DOTY_DIRECTORY}/config/tmux/tpm/tpm"
 }
 

@@ -1282,6 +1282,7 @@ _apply_theme() {
   # -- custom variables ------------------------------------------------------
 
   if [ -f "$TMUX_CONF_LOCAL" ] && [ "$(cut -c3- "$TMUX_CONF_LOCAL" | sh 2>/dev/null -s printf probe)" = "probe" ]; then
+    replacements=$(perl -n -e 'print if s!^#\s+([^_][^()\s]+)\s*\(\)\s*{\s*(?:#.*)?\n!s%#\\\{\1((?:\\s+(?:[^\{\}]+?|#\\{(?:[^\{\}]+?)\}))*)\\\}%#(cat \"\\\$DOTY_TMUX_THEME\" | sh -s \1\\1)%g; !p' "$TMUX_CONF_LOCAL")
     replacements=$(perl -n -e 'print if s!^#\s+([^_][^()\s]+)\s*\(\)\s*{\s*(?:#.*)?\n!s%#\\\{\1((?:\\s+(?:[^\{\}]+?|#\\{(?:[^\{\}]+?)\}))*)\\\}%#(cut -c3- \"\\\$TMUX_CONF_LOCAL\" | sh -s \1\\1)%g; !p' "$TMUX_CONF_LOCAL")
     status_left=$(echo "$status_left" | perl -p -e "$replacements" || echo "$status_left")
     status_right=$(echo "$status_right" | perl -p -e "$replacements" || echo "$status_right")
@@ -1296,27 +1297,33 @@ __apply_plugins() {
   window_active="$1"
   tmux_conf_update_plugins_on_launch="$2"
   tmux_conf_update_plugins_on_reload="$3"
+  tmux_conf_uninstall_plugins_on_reload="$4"
 
   if [ -z "$TMUX_PLUGIN_MANAGER_PATH" ]; then
     return 255
   fi
   mkdir -p "$TMUX_PLUGIN_MANAGER_PATH"
 
-  tpm_dir="$(dirname "${TMUX_PLUGIN_MANAGER_PATH}")"
   tpm_plugins=$(tmux show -gvq '@tpm_plugins' 2>/dev/null)
   if [ -z "$(tmux show -gv '@plugin' 2>/dev/null)" ] && [ -z "$tpm_plugins" ]; then
     return
   fi
 
+  tpm_dir="$(dirname "${TMUX_PLUGIN_MANAGER_PATH}")"
+  theme_tpm_dir=$(tmux show -gvq '@tpm-path' 2>/dev/null)
+  if [ ! -z "$theme_tpm_dir" ]; then
+    tpm_dir="$(dirname "${theme_tpm_dir}")"
+  fi
+
   if [ "$(command tmux display -p '#{pid} #{version} #{socket_path}')" = "$($TMUX_PROGRAM display -p '#{pid} #{version} #{socket_path}')" ]; then
     if [ -f "$TMUX_CONF_LOCAL" ]; then
-      tpm_plugins=$(
+      tpm_local_plugins=$(
         cat <<EOF | tr ' ' '\n' | awk '/^\s*$/ {next;}; !seen[$0]++ { gsub(/^[ \t]+/,"",$0); gsub(/[ \t]+$/,"",$0); print $0 }'
         $(awk '/^[ \t]*set(-option)?.*[ \t]@plugin[ \t]/ { gsub(/'\''/, ""); gsub(/'\"'/, ""); print $NF }' "$TMUX_CONF_LOCAL" 2>/dev/null)
 EOF
       )
     fi
-    tmux set -g '@tpm_plugins' "$tpm_plugins"
+    tmux set -g '@tpm_plugins' "$tpm_plugins $tpm_local_plugins"
 
     if _is_true "$tmux_conf_update_plugins_on_launch" || _is_true "$tmux_conf_update_plugins_on_reload"; then
       if git ls-remote -hq https://github.com/gpakosz/.tmux.git master >/dev/null; then
@@ -1337,14 +1344,15 @@ EOF
           perl -p -i -e 's,\$tmux_file\s+>/dev/null\s+2>\&1,$& || { tmux display "Plugin \$(basename \${plugin_path}) failed" && false; },' "$tpm_dir/tpm/scripts/source_plugins.sh"
         fi
 
+        echo "" > "$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt"
         if [ "$update_tpm" = "true" ]; then
           {
-            echo "Invoking $tpm_dir/tpm/bin/install_plugins ..." >"$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
-              "$tpm_dir/tpm/bin/install_plugins" >>"$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
-              echo "Invoking $tpm_dir/tpm/bin/update_plugins all ..." >"$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
-              "$tpm_dir/tpm/bin/update_plugins" all >>"$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
-              echo "Invoking $tpm_dir/tpm/bin/clean_plugins all ..." >"$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
-              "$tpm_dir/tpm/bin/clean_plugins" all >>"$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
+            echo "Invoking $tpm_dir/tpm/bin/install_plugins ..." >> "$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
+              "$tpm_dir/tpm/bin/install_plugins" >> "$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 2>&1 &&
+              echo "Invoking $tpm_dir/tpm/bin/update_plugins all ..." >> "$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
+              "$tpm_dir/tpm/bin/update_plugins" all >> "$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
+              echo "Invoking $tpm_dir/tpm/bin/clean_plugins all ..." >> "$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
+              "$tpm_dir/tpm/bin/clean_plugins" all >> "$TMUX_PLUGIN_MANAGER_PATH/tpm_log.txt" 2>&1 &&
               tmux display 'Done updating tpm and plugins...'
           } || tmux display 'Failed updating tpm and plugins...'
         elif [ "$install_tpm" = "true" ]; then
@@ -1378,18 +1386,19 @@ EOF
 _apply_plugins() {
   tmux_conf_update_plugins_on_launch=${tmux_conf_update_plugins_on_launch:-true}
   tmux_conf_update_plugins_on_reload=${tmux_conf_update_plugins_on_reload:-true}
+  tmux_conf_uninstall_plugins_on_reload=${tmux_conf_uninstall_plugins_on_reload:-true}
 
   tpm_plugins=$(tmux show -gvq '@tpm_plugins' 2>/dev/null)
   if [ -n "$(tmux show -gv '@plugin' 2>/dev/null)" ] || [ -n "$tpm_plugins" ]; then
     if [ -z "$TMUX_PLUGIN_MANAGER_PATH" ]; then
-      if [ "$(dirname "$TMUX_CONF")" = "$HOME" ]; then
+      if [ "$(dirname "$TMUX_CONF_LOCAL")" = "$HOME" ]; then
         TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
       else
-        TMUX_PLUGIN_MANAGER_PATH="$(dirname "$TMUX_CONF")/plugins"
+        TMUX_PLUGIN_MANAGER_PATH="$(dirname "$TMUX_CONF_LOCAL")/plugins"
       fi
       tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGIN_MANAGER_PATH"
     fi
-    tmux run -b "cat '$DOTY_TMUX_THEME' | sh -s __apply_plugins '$window_active' '$tmux_conf_update_plugins_on_launch' '$tmux_conf_update_plugins_on_reload'"
+    tmux run -b "cat '$DOTY_TMUX_THEME' | sh -s __apply_plugins '$window_active' '$tmux_conf_update_plugins_on_launch' '$tmux_conf_update_plugins_on_reload' '$tmux_conf_uninstall_plugins_on_reload'"
   fi
 }
 
@@ -1420,6 +1429,10 @@ _apply_important() {
 		IFS='#' read -ra conf <<< "$conf"
 		__apply_important "${conf[0]}"
 	done
+
+  __apply_important "$DOTY_TMUX_KEYMAP_CONF"
+  __apply_important "$DOTY_TMUX_CONF"
+  __apply_important "$TMUX_CONF_LOCAL"
 }
 
 _apply_configuration() {

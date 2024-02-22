@@ -13,24 +13,3 @@
 [submodule "tmux-tpm"]
 	path = config/tmux/tpm
 	url = git@github.com:tmux-plugins/tpm.git
-[submodule "tmux-sidebar"]
-	path = config/tmux/plugins/tmux-sidebar
-	url = git@github.com:tmux-plugins/tmux-sidebar.git
-[submodule "tmux-prefix-highlight"]
-	path = config/tmux/plugins/tmux-prefix-highlight
-	url = git@github.com:tmux-plugins/tmux-prefix-highlight.git
-[submodule "tmux-net-speed"]
-	path = config/tmux/plugins/tmux-net-speed
-	url = git@github.com:tmux-plugins/tmux-net-speed.git
-[submodule "tmux-online-status"]
-	path = config/tmux/plugins/tmux-online-status
-	url = git@github.com:tmux-plugins/tmux-online-status.git
-[submodule "tmux-fpp"]
-	path = config/tmux/plugins/tmux-fpp
-	url = git@github.com:tmux-plugins/tmux-fpp.git
-[submodule "tmux-copycat"]
-	path = config/tmux/plugins/tmux-copycat
-	url = git@github.com:tmux-plugins/tmux-copycat.git
-[submodule "tmux-battery"]
-	path = config/tmux/plugins/tmux-battery
-	url = git@github.com:tmux-plugins/tmux-battery.git
