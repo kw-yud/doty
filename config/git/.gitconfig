@@ -221,6 +221,22 @@
     pl = pull
     pb = pull --rebase
 
+    module-rm = "!f() { \
+        _submodule_dir=$(git config --file .gitmodules --get \"submodule.$1.path\"); \
+        git submodule deinit -f -- $_submodule_dir; \
+        rm -rf \".git/modules/$1\"; \
+        git rm -f $_submodule_dir; \
+        git add .gitmodules; \
+    }; f"
+    module-update = "!f() { \
+        git submodule update --init --recursive; \
+	    git submodule foreach 'git fetch origin; \
+            git checkout $(git rev-parse --abbrev-ref HEAD); \
+            git reset --hard origin/$(git rev-parse --abbrev-ref HEAD); \
+            git submodule update --recursive; \
+            git clean -dfx'; \
+    }; f"
+
     # Find out who is currently active on the repository
     # Displays committers in descending order of number of commits
     who = shortlog --numbered --summary --email --no-merges --since="3 months"
