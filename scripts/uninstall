@@ -1,0 +1,89 @@
+#!/usr/bin/env sh
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT_DIR="$(realpath ${SCRIPT_DIR}/..)"
+
+source "${ROOT_DIR}/scripts/utils"
+
+backup_dir="${DOTY_DIRECTORY}/.backups"
+backup_source=
+
+function backup_chooser() {
+    for BACKUP in $(ls ${backup_dir}); do
+        printf "${FMT_BOLD}${FMT_BLUE}%s${FMT_RESET}     " ${BACKUP}
+        
+        prompt "Do you want to restore this?"
+        if [ $? == 1 ]; then
+            backup_source="${BACKUP}"
+            break
+        fi
+    done
+}
+
+prompt "Are you sure you want to remove Doty?"
+if [ $? == 0 ]; then
+    echo_red "Uninstall cancelled"
+    exit
+fi
+
+echo
+
+echo_green "Choose your backup source..."
+separator
+backup_chooser
+echo
+
+if [ -z ${backup_source} ]; then
+    error "No backup source has been choosed. Exit!"
+    exit 2
+fi
+
+backup_source_dir="${backup_dir}/${backup_source}"
+info "Set ${FMT_BOLD}${FMT_GREEN}${backup_source}${FMT_RESET} ${FMT_BLUE}as backup source"
+echo
+echo
+
+if hash chsh >/dev/null 2>&1 && [ -f "${backup_source_dir}/.shell" ]; then
+    old_shell=$(cat "${backup_source_dir}/.shell")
+    echo "Switching your shell back to '$old_shell':"
+
+    if chsh -s "$old_shell"; then
+        success "Shell changed to ${old_shell}."
+    else
+        error "Could not change default shell."
+        echo_red "Change it manually by running chsh or editing the /etc/passwd file."
+        exit
+    fi
+fi
+
+prompt "Do you want to keep backup dir? (${backup_dir})"
+if [ $? == 1 ]; then
+    mkdir -p "${HOME}/.dotybackups"
+    mv "${backup_dir}/" "${HOME}/.dotybackups/"
+    info "Backup dir moved to ${HOME}/.dotybackups"
+fi
+
+if [ -e ${HOME}/.zshrc ]; then
+    ZSHRC_SAVE=${HOME}/.zshrc.doty-uninstalled-$(date +%Y-%m-%d_%H-%M-%S)
+    info "Found ${HOME}/.zshrc -- Renaming to ${ZSHRC_SAVE}"
+    mv ${HOME}/.zshrc "${ZSHRC_SAVE}"
+fi
+
+info "Looking for original zsh config..."
+
+ZSHRC_ORIG="${backup_source_dir}/.zshrc"
+if [ -e "$ZSHRC_ORIG" ]; then
+    info "Found $ZSHRC_ORIG -- Restoring to ${HOME}/.zshrc"
+    mv "$ZSHRC_ORIG" ${HOME}/.zshrc
+    info "Your original zsh config was restored."
+else
+    warning "No original zsh config found"
+fi
+
+echo
+echo
+echo_green "Thanks for trying out Doty."
+echo_green "It's been uninstalled."
+separator
+warning "You need to  manually remove: ${DOTY_DIRECTORY}"
+echo
+echo_yellow "Don't forget to restart your terminal!"
