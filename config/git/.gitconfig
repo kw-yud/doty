@@ -102,9 +102,6 @@
     # Make `git push` push relevant annotated tags when pushing branches out.
     # followTags = true
 
-[sequence]
-    editor=interactive-rebase-tool
-
 # URL shorthands
 [alias]
     # https://git.wiki.kernel.org/articles/a/l/i/Aliases.html
