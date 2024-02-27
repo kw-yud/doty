@@ -13,3 +13,6 @@
 [submodule "tmux-tpm"]
 	path = config/tmux/tpm
 	url = git@github.com:tmux-plugins/tpm.git
+[submodule "themes"]
+	path = themes/powerlevel10k
+	url = git@github.com:romkatv/powerlevel10k.git
