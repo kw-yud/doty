@@ -13,6 +13,20 @@ lspconfig.clangd.setup {
     capabilities = lsp_status.capabilities
 }
 
+-- setup helm-ls
+lspconfig.helm_ls.setup {
+    settings = {
+        ['helm-ls'] = {
+            yamlls = {
+                path = "yaml-language-server",
+            }
+        }
+    }
+}
+
+-- setup yamlls
+lspconfig.yamlls.setup {}
+
 -- lspconfig.pyls_ms.setup({
 --     handlers = lsp_status.extensions.pyls_ms.setup(),
 --     settings = {python = {workspaceSymbols = {enabled = true}}},
