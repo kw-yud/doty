@@ -25,12 +25,14 @@ return {
     --
     "williamboman/mason.nvim",
     name = "mason",
+    config = function() require("doty.plugins.mason") end
   },
   {
     --
     "williamboman/mason-lspconfig.nvim",
     name = "mason-lspconfig",
     dependencies = { "williamboman/mason.nvim" },
+    config = function() require("doty.plugins.mason-lspconfig") end
   },
   {
     "neovim/nvim-lspconfig",
@@ -39,11 +41,7 @@ return {
       "SmiteshP/nvim-navbuddy",
       "nvim-lua/lsp-status.nvim"
     },
-    config = function()
-      require("doty.plugins.mason")
-      require("doty.plugins.mason-lspconfig")
-      require("doty.plugins.nvim-lspconfig")
-    end
+    config = function() require("doty.plugins.nvim-lspconfig") end
   },
   -- {
   --     "WhoIsSethDaniel/mason-tool-installer.nvim",
