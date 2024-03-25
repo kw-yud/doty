@@ -12,4 +12,4 @@ transparent.setup {
     extra_groups = {"Comment"},
     exclude_groups = {} -- table: groups you don't want to clear
 }
-transparent.toggle(true)
+transparent.toggle(false)
