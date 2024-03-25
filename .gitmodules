@@ -24,3 +24,9 @@
 	path = plugins/zsh-syntax-highlighting
 	url = git@github.com:zsh-users/zsh-syntax-highlighting.git
 	branch = master
+[submodule "devops-bash-tools"]
+	path = libraries/devops-bash-tools
+	url = git@github.com:HariSekhon/DevOps-Bash-tools.git
+[submodule "gitalias"]
+	path = libraries/gitalias
+	url = git@github.com:GitAlias/gitalias.git
