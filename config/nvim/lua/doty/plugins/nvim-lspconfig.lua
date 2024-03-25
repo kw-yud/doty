@@ -9,12 +9,37 @@ local masonlspconfig = require("mason-lspconfig")
 -- lspconfig.util.ensure_installed()
 -- lspconfig.util.ensure_attached()
 
+lspconfig.util.on_setup = lspconfig.util.add_hook_after(lspconfig.util.on_setup, function(config)
+  if config.name == 'lua_ls' then
+    -- workaround for nvim's incorrect handling of scopes in the workspace/configuration handler
+    -- https://github.com/folke/neodev.nvim/issues/41
+    -- https://github.com/LuaLS/lua-language-server/issues/1089
+    -- https://github.com/LuaLS/lua-language-server/issues/1596
+    -- https://github.com/LuaLS/lua-language-server/issues/1596#issuecomment-1855087288
+    config.handlers = vim.tbl_extend('error', {}, config.handlers)
+    config.handlers['workspace/configuration'] = function(...)
+      local _, result, ctx = ...
+      local client_id = ctx.client_id
+      local client = vim.lsp.get_client_by_id(client_id)
+      if client and client.workspace_folders and #client.workspace_folders then
+        if result.items and #result.items > 0 then
+          if not result.items[1].scopeUri then
+            return vim.tbl_map(function(_) return nil end, result.items)
+          end
+        end
+      end
+
+      return vim.lsp.handlers['workspace/configuration'](...)
+    end
+  end
+end)
+
 masonlspconfig.setup_handlers {
   lsp_zero.default_setup,
   lspconfig.lua_ls.setup {
     settings = {
       Lua = {
-        diagnostics = { globals = { "vim", "custom_nvim" } },
+        diagnostics = { globals = { "vim" } },
         workspace = {
           library = vim.api.nvim_get_runtime_file("", true),
           checkThirdParty = false,
