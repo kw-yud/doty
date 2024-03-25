@@ -16,8 +16,8 @@ if g.neovide then
     g.neovide_cursor_trail_legnth = 0
     g.neovide_cursor_animation_length = 0
     -- vim.o.guifont = "Jetbrains Mono"
-    vim.o.guifont = "Source Code Pro:h14" -- text below applies for VimScript
-
+    -- vim.o.guifont = "Source Code Pro:h14" -- text below applies for VimScript
+    vim.o.guifont = "Cascasdia Code:h14" 
     -- Helper function for transparency formatting
     local alpha = function()
         return string.format("%x", math.floor(255 * g.transparency or 0.8))
@@ -99,7 +99,7 @@ opt.list = true -- List mode: By default, show tabs as ">", trailing spaces as "
 opt.cursorline = true -- Highlight the text line of the cursor with CursorLine hl-CursorLine.
 opt.signcolumn = 'yes'
 opt.listchars = {
-    tab = '❘-',
+    tab = '',
     trail = '·',
     lead = '·',
     extends = '»',
