@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# Standarized $0 handling, following:
+# Standardized $0 handling, following:
 # https://z-shell.github.io/zsh-plugin-assessor/Zsh-Plugin-Standard
 0="${${ZERO:-${0:#$ZSH_ARGZERO}}:-${(%):-%N}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
@@ -23,7 +23,7 @@ if ! type "docker" > /dev/null; then
   # alias docker=podman
   # alias docker-compose=podman-compose
 
-  export DOCKER_HOST="unix://$(podman machine inspect | jq -r '.[0].ConnectionInfo.PodmanSocket.Path')"
+  export DOCKER_HOST="unix://$(podman machine inspect &> /dev/null | jq -r '.[0].ConnectionInfo.PodmanSocket.Path')"
 fi
 
 [[ -f "${0:h}/aliases" ]] && source "${0:h}/aliases"
