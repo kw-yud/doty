@@ -7,9 +7,9 @@ require('mason-lspconfig').setup {
     "bashls",                                                -- Bash
     "bufls",                                                 -- Buf
     "diagnosticls",                                          -- Diagnostic (general purpose server)
-    -- Docker
+    -- Docker -----
     "dockerls", "docker_compose_language_service",           -- End
-    -- Dot files
+    -- Dot files -----
     "dotls",                                                 -- End
     -- Go -----
     "golangci_lint_ls", "gopls",                             -- End
