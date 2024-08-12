@@ -7,6 +7,8 @@ CURRENT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # [tmux] load scripts in ~/.tmux on creating a new pane
 # load order: __before__.sh, ${session_name}.sh, __after__.sh
 function doty_tmux_load_startup_scripts() {
+    tmux set-environment -g DOTY_TMUX_PREFIX "${DOTY_TMUX_PREFIX:-"C-a"}"
+
     tmux set-environment -g DOTY_TMUX_DIRECTORY "${CURRENT_DIR}"
     tmux set-environment -g DOTY_TMUX_CONF "${CURRENT_DIR}/tmux.conf"
     tmux set-environment -g DOTY_TMUX_KEYMAP_CONF "${CURRENT_DIR}/keymap.conf"
