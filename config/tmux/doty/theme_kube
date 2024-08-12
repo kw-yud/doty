@@ -128,7 +128,7 @@ _kube_tmux_get_context_ns() {
   elif [[ "${KUBE_TMUX_NS_ENABLE}" == true ]]; then
     KUBE_TMUX_NAMESPACE="$(${KUBE_TMUX_BINARY} config view --minify --output 'jsonpath={..namespace}' 2>/dev/null)"
     # Set namespace to 'default' if it is not defined
-    KUBE_TMUX_NAMESPACE="${KUBE_TMUX_NAMESPACE:-default}"
+    KUBE_TMUX_NAMESPACE="${KUBE_TMUX_NAMESPACE:-N/A}"
   fi
 }
 
