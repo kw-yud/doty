@@ -56,6 +56,10 @@ return {
     end,
   },
   -- {
+  --  "stevearc/conform.nvim",
+  --  config = function() require("doty.plugins.nvim-lspconfig-conform") end
+  -- },
+  -- {
   --     "WhoIsSethDaniel/mason-tool-installer.nvim",
   --     config = function()
   --         require("mason-tool-installer").setup {

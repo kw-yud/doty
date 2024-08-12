@@ -19,9 +19,11 @@ require('mason-lspconfig').setup {
     "marksman", "prosemd_lsp", "remark_ls", "vale_ls", "zk", -- End
     "spectral",                                              -- OpenAPI
     "rust_analyzer",                                         -- Rust
+    -- Python -----
+    -- "pylsp",                                  -- Python
     -- SQL
-    "sqlls", "sqls",                                         -- End
-    "yamlls"                                                 -- YAML
+    "sqlls", "sqls", -- End
+    "yamlls"         -- YAML
   },
 
   -- Whether servers that are set up (via lspconfig) should be automatically installed if they're not already installed.

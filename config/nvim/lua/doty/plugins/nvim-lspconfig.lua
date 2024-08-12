@@ -164,6 +164,23 @@ masonlspconfig.setup_handlers {
   }
 }
 
+lspconfig.pylsp.setup({
+  settings = {
+    pylsp = {
+      plugins = {
+        pycodsyle = {
+          ignore = { 'W391', 'E501' },
+          maxLineLength = 120
+        }
+      }
+    }
+  }
+})
+
+-- lspconfig.robotframework_ls.setup({
+--   pythonpath = os.getenv("PYENV_ROOT") .. "/shims/python"
+-- })
+
 -- Global mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 -- vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
