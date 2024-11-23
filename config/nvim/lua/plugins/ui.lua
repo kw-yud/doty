@@ -56,7 +56,7 @@ return {
       'nvim-treesitter/nvim-treesitter'
     },
     ---@type NoiceConfig
-    opts = function() return require("doty.plugins.noice") end
+    -- opts = function() return require("doty.plugins.noice") end
   },
   {
     'stevearc/dressing.nvim',
