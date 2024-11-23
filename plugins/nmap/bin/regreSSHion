@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+function scan {
+  nmap -sV -Pn -p22 ${@} | awk '/Nmap scan report/{ip=$5} /OpenSSH/ {
+    status = "Not vulnerable"
+    if ($5 >= "8.5p1" && $5 < "9.8p1") {
+        status = "Vulnerable to CVE-2024-6387"
+    } else if ($5 >= "4.4p1" && $5 < "8.5p1") {
+        status = "Not vulnerable to CVE-2024-6387 (patched for CVE-2006-5051)"
+    } else if ($5 < "4.4p1") {
+        status = "Vulnerable to regreSSHion (unless patched for CVE-2006-5051 and CVE-2008-4109)"
+    }
+    
+    print "Server: "ip"\t", "OpenSSH Version: "$5"\t", "Status: "status
+  }' | sort
+}
+
+if [ -z "$1" ]; then
+  echo "Missing required arguments <ip> or <filename>"
+  exit 1
+fi
+
+if [ -f "$1" ]; then
+  scan -iL "$1"
+elif [[ "$1" == *"/"* ]]; then
+  scan -R "$1"
+else
+  scan $1
+fi
+

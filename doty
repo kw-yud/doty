@@ -50,6 +50,7 @@ if [[ -z $plugins ]]; then
         last-working-dir
         limactl
         # mise
+        nmap
         nodenv
         npm
         nvm

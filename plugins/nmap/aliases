@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+alias check-port="sudo nmap -Pn ip -p"
+alias open-port="sudo nmap -sS -Pn -sVC -vv --open -T4"
