@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# Enable the errexit option
+set -e
+
+FMT_RED=$(printf '\033[31m')
+FMT_GREEN=$(printf '\033[32m')
+FMT_YELLOW=$(printf '\033[33m')
+FMT_BLUE=$(printf '\033[34m')
+FMT_BOLD=$(printf '\033[1m')
+FMT_GRAY=$(printf '\033[1;38;5;243m')
+FMT_RESET=$(printf '\033[0m')
+
+usage() {
+    echo "$0 usage:" && grep " .)\ \#" $0
+    exit 0
+}
+
+declare -a keys=()
+declare -a values=()
+while getopts ":h:k:v:" arg; do
+    case "${arg}" in
+    k) # Filter the config data by key.
+        keys+=("\"$OPTARG\"")
+        ;;
+    v) # Filter the config data by the value.
+        values+=("\"$OPTARG\"")
+        ;;
+    h | *) # Display help.
+        usage
+        exit 0
+    ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+raw_resource=$(< /dev/stdin)
+is_json=false
+if jq -e . >/dev/null 2>&1 <<<"$raw_resource"; then
+  is_json=true
+fi
+
+if ! $is_json; then
+  if [[ "$raw_resource" == -* ]]; then
+    raw_resource="$(echo "$raw_resource" | yq '.[] | split_doc')"
+  fi
+  
+  raw_resource="$(echo "$raw_resource" | yq e -o=json)"
+fi
+
+input="$(echo "$raw_resource" | jq -s -r 'map(. + (if (.kind == "Secret") then {"data": (.data // {}) | map_values(@base64d)} else {} end)) | map(select([.kind] | inside(["Secret", "ConfigMap"])))')"
+
+results_key="$(echo "${input}" | jq -r --arg args "[$(IFS=, ; echo "${keys[*]}")]" \
+    'map({
+        "name": .metadata.name,
+        "namespace": .metadata.namespace,
+        "kind": .kind,
+        "data": (.data // {}) | with_entries(select( [.key | ascii_upcase | contains($args | fromjson | .[] | ascii_upcase)] | any ))
+    })
+    | map(select(.data != {} ))
+    | group_by(.kind) | map({ key: .[0].kind, value: ([.[] | {"\(.namespace)/\(.name)": .data}] | add) }) | from_entries
+    | if . == {} then empty else . end')"
+
+results_value="$(echo "${input}" | jq -r --arg args "[$(IFS=, ; echo "${values[*]}")]" \
+    'map({
+        "name": .metadata.name,
+        "namespace": .metadata.namespace,
+        "kind": .kind,
+        "data": (.data // {}) | with_entries(select( [.value | tostring | contains($args | fromjson | .[])] | any ))
+    })
+    | map(select(.data != {} ))
+    | group_by(.kind) | map({ key: .[0].kind, value: ([.[] | {"\(.namespace)/\(.name)": .data}] | add) }) | from_entries
+    | if . == {} then empty else . end')"
+
+if [ -z "${results_key}" ] && [ -z "${results_value}" ]; then
+    printf '%s%s%s%s\n' "${FMT_BOLD}${FMT_YELLOW}" "${FMT_RESET}${FMT_RED}" "No results found" "$FMT_RESET" >&2
+    if $is_json; then
+        printf 'Ensure to add \033[2m%s\033[22m if the resource is multiple\n\n' "\`| jq -r '.items[]'\`" >&2
+        printf 'e.g. \033[2m%s\033[22m\n' "kubectl get secrets -o json | jq -r '.items[]'" >&2
+    else
+        printf 'Ensure to add \033[2m%s\033[22m if the resource is multiple\n\n' "\`| yq -r '.items'\`" >&2
+        printf 'e.g. \033[2m%s\033[22m\n' "kubectl get secrets -o yaml | jq -r '.items'" >&2
+    fi
+
+    exit 1
+fi
+
+results="$(echo "${results_key}" "${results_value}" | jq -s 'def deepmerge(a;b):
+  reduce b[] as $item (a;
+    reduce ($item | keys_unsorted[]) as $key (.;
+      $item[$key] as $val | ($val | type) as $type | .[$key] = if ($type == "object") then
+        deepmerge({}; [if .[$key] == null then {} else .[$key] end, $val])
+      elif ($type == "array") then
+        (.[$key] + $val | unique)
+      else
+        $val
+      end)
+    );
+    deepmerge({}; .)')"
+
+if $is_json; then
+    echo "$results" | jq
+else
+    echo "$results" | yq -P
+fi
