@@ -48,6 +48,7 @@ if [[ -z $plugins ]]; then
         jsontools
         kubectl
         last-working-dir
+        limactl
         nodenv
         npm
         nvm
