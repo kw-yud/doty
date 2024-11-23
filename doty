@@ -35,6 +35,7 @@ if [[ -z $plugins ]]; then
         command-not-found
         copyfile
         copypath
+        cve
         dotenv
         emoji
         emotty
