@@ -1,19 +1,19 @@
 -- Set colorscheme after options
 require("colorbuddy").colorscheme "tokyonight-night"
 require("colorizer").setup({
-    '*', -- Highlight all files, but customize some others.
-    'conf',
-    html = {css = true},
-    scss = {css = true},
-    css = {css = true},
-    javascript = {no_names = true}
+  '*', -- Highlight all files, but customize some others.
+  'conf',
+  html = { css = true },
+  scss = { css = true },
+  css = { css = true },
+  javascript = { no_names = true }
 }, {
-    RGB = true, -- #RGB hex codes
-    RRGGBB = true, -- #RRGGBB hex codes
-    names = true, -- "Name" codes like Blue
-    RRGGBBAA = true, -- #RRGGBBAA hex codes
-    -- Available modes: foreground, background
-    mode = 'background' -- Set the display mode.
+  RGB = true,         -- #RGB hex codes
+  RRGGBB = true,      -- #RRGGBB hex codes
+  names = true,       -- "Name" codes like Blue
+  RRGGBBAA = true,    -- #RRGGBBAA hex codes
+  -- Available modes: foreground, background
+  mode = 'background' -- Set the display mode.
 })
 
 -- if os.getenv("TERM") =~ '^\(rxvt\|screen\|interix\|putty\)\(-.*\)\?$'
@@ -37,4 +37,3 @@ require("colorizer").setup({
 -- vim.cmd('set termguicolors')
 -- vim.cmd('set ft=conf')
 -- vim.api.nvim_command("BufReadPost *.conf setl ft=conf")
-

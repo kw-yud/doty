@@ -13,14 +13,14 @@ local opt = vim.opt -- Set options (global/buffer/windows-scoped)
 -----------------------------------------------------------
 -- See: https://neovide.dev/configuration.html
 if g.neovide then
-  g.neovide_cursor_trail_legnth = 0
+  g.neovide_cursor_trail_length = 0
   g.neovide_cursor_animation_length = 0
   -- vim.o.guifont = "Jetbrains Mono"
   -- vim.o.guifont = "Source Code Pro:h14" -- text below applies for VimScript
   vim.o.guifont = "Cascasdia Code:h14"
   -- Helper function for transparency formatting
   local alpha = function()
-    return string.format("%x", math.floor(255 * g.transparency or 0.8))
+    return string.format("%x", math.floor((255 * g.transparency) or 0.8))
   end
 
   -- g:neovide_transparency should be 0 if you want to unify transparency of content and title bar.
@@ -89,7 +89,7 @@ opt.whichwrap = 'b,s,<,>,[,]'
 -- opt.mousemoveevent = true
 
 -- -----------------------------------------------------------
--- -- Syntaxt, Highlight
+-- -- Syntax, Highlight
 -- -----------------------------------------------------------
 opt.hlsearch = true   -- When there is a previous search pattern, highlight all its matches.
 opt.incsearch = true  -- While typing a search command, show where the pattern, as it was typed so far, matches.
@@ -100,7 +100,7 @@ opt.cursorline = true -- Highlight the text line of the cursor with CursorLine h
 opt.signcolumn = 'yes'
 opt.listchars = {
   tab = '',
-  trail = '·',
+  trail = '⭘', -- ·
   lead = '·',
   extends = '»',
   precedes = '«',

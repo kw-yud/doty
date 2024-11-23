@@ -73,12 +73,13 @@ return {
         return vim.ui.input(...)
       end
     end
-  }, {
-  "folke/trouble.nvim",
-  name = "trouble",
-  dependencies = { "nvim-tree/nvim-web-devicons" },
-  opts = function() return require("doty.plugins.trouble") end
-},
+  },
+  {
+    "folke/trouble.nvim",
+    name = "trouble",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = function() return require("doty.plugins.trouble") end
+  },
   -- {
   -- Remove all background colors to make nvim transparent
   --    "xiyaowong/nvim-transparent",
@@ -116,7 +117,7 @@ return {
       require('dashboard').setup {
         theme = 'doom',           --  theme is doom and hyper default is hyper
         disable_move = false,     --  default is false disable move keymap for hyper
-        shortcut_type = "number", --  shorcut type 'letter' or 'number'
+        shortcut_type = "number", --  shortcut type 'letter' or 'number'
         -- change_to_vcs_root, -- default is false,for open file in hyper mru. it will change to the root of vcs
         config = {}               --  config used for theme
         -- hide = {
