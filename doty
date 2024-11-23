@@ -49,6 +49,7 @@ if [[ -z $plugins ]]; then
         kubectl
         last-working-dir
         limactl
+        # mise
         nodenv
         npm
         nvm
