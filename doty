@@ -54,7 +54,7 @@ if [[ -z $plugins ]]; then
         nodenv
         npm
         nvm
-        # pip
+        # pop
         pre-commit
         # pyenv
         # pylint
@@ -68,7 +68,6 @@ if [[ -z $plugins ]]; then
 
         ### Local
         android
-        asdf
         encode64
         fzf
         github
