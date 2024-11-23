@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+
+KUBECTX_PREFIX="${TMPDIR}kubectx"
+OPT_KEY="@doty-kubeconfig"
+
+current_pane_id="$(tmux display-message -p 's#{session_name}w#{window_index}p#{pane_index}_#{pane_pid}')"
+prev_pane_id="$(tmux show -gqv "${OPT_KEY}")"
+
+DEBUG_MODE=""
+function debug() {
+  if [ -n "$DEBUG_MODE" ]; then
+    echo "$1: ${2}"
+  fi
+}
+
+function opt_key_current_session() {
+  echo "${OPT_KEY}-$(tmux display-message -p 's#{session_name}')"
+}
+
+function opt_key_current_session_window() {
+  echo "${OPT_KEY}-$(tmux display-message -p 's#{session_name}w#{window_index}')"
+}
+
+function current_context() {
+  $KUBECTL config view -o=jsonpath='{.current-context}'
+}
+
+function set_context() {
+  $KUBECTL config use-context "${1}" 1>/dev/null 2>&1
+}
+
+function unset_context() {
+  $KUBECTL config unset current-context 1>/dev/null 2>&1
+}
+
+function unset_or_use_prev_context() {
+  # If current context file exists, ignore it.
+  if [ -z "$(tmux show -gqv "${OPT_KEY}-overwrite-context")" ] && ! has_recorded_context "${1}"; then
+    debug "unset_or_use_prev_context" "overwrite-context disabled and no options"
+    return
+  fi
+
+  # Set context from the same session window if exists.
+  context_session_window=$(tmux show -gqv "$(opt_key_current_session_window)")
+  if [ -n "${context_session_window}" ]; then
+    debug "unset_or_use_prev_context" "restore from session window: ${context_session_window}"
+    set_context "${context_session_window}"
+    return
+  fi
+
+  # Set context from the same session if exists.
+  context_session=$(tmux show -gqv "$(opt_key_current_session)")
+  if [ -n "${context_session}" ]; then
+    debug "unset_or_use_prev_context" "restore from session: ${context_session}"
+    set_context "${context_session}"
+    return
+  fi
+
+  debug "unset_or_use_prev_context" "no session founds"
+  # There is no same session context founds.
+  unset_context
+}
+
+function has_recorded_context() {
+  tmux show -gv "${OPT_KEY}-${1}" 1>/dev/null 2>&1
+}
+
+function read_context() {
+  tmux show -gqv "${OPT_KEY}-${1}"
+  #if [[ -f "${KUBECTX_PREFIX}_${1}" ]]; then
+  #  cat "${KUBECTX_PREFIX}_${1}"
+  #fi
+}
+
+function record_context() {
+  debug "record_context" "${KUBECTX_PREFIX}_${1} as ${2}"
+  #printf %s "${2}" > "${KUBECTX_PREFIX}_${1}"
+  tmux set -g "${OPT_KEY}-${1}" "${2}"
+}
+
+function store_context() {
+  current="$(current_context)"
+
+  record_context "${1}" "${current}"
+
+  # If there is no context for current pane, ignore it
+  if [ -z "${current}" ]; then
+    return
+  fi
+
+  # Update existing session options to use current context
+  tmux set -g "$(opt_key_current_session)" "${current}"
+  tmux set -g "$(opt_key_current_session_window)" "${current}"
+}
+
+function restore_context() {
+  saved="$(read_context "${1}")"
+
+  debug "restore_context" "${KUBECTX_PREFIX}_${1} as ${saved}"
+  if [ -n "${saved}" ]; then
+    set_context "${saved}"
+  else
+    unset_or_use_prev_context "${1}"
+  fi
+}
+
+# Skip if there is only 1 pane
+if [ "$(tmux list-panes -a)" -lt 2 ]; then
+  return
+fi
+
+# TODO: Add mutex lock
+# while $(tmux show -gqv "@doty-kubeconfig-lock"); do
+#   sleep 10
+# done
+# tmux set -g "@doty-kubeconfig-lock" "1"
+
+if [[ -z "${KUBECTL:-}" ]]; then
+  if hash kubectl 2>/dev/null; then
+    KUBECTL=kubectl
+  elif hash kubectl.exe  2>/dev/null; then
+    KUBECTL=kubectl.exe
+  else
+    echo >&2 "kubectl is not installed"
+    exit 1
+  fi
+fi
+
+# Backup previous context if available
+if [ -n "$prev_pane_id" ]; then
+  store_context "${prev_pane_id}"
+fi
+
+# Ensure to unset the context first.
+# unset_context
+
+# Restore context from previous session if available,
+# or unset the context if not exists
+restore_context "${current_pane_id}"
+
+# Store current session identifier to be backed up later.
+tmux set -g "@doty-kubeconfig" "${current_pane_id}"
+
