@@ -18,15 +18,17 @@
 # - Supports ipv6 VPN Gateway.
 #
 # USAGE:
-#   doty-firewall start <gateway> <gateway> ...
-#   doty-friwall stop
+#   vpn-net start <gateway> <gateway> ...
+#   vpn-net stop
 
 set -euo pipefail
 
 SCRIPTNAME=$(basename "$0")
+SCRIPT_DIR=$(dirname $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd))
 
 # List of IP address of VPN server.
 declare -a VPN_IP=()
+VPN_PORT=2194
 # List of utun interface as gateways.
 declare -a UTUN_IFACE=()
 # DNS resolver for mapping domain names to IP addresses.
@@ -51,6 +53,7 @@ ${FMT_BLUE}Commands:${FMT_RESET}
 
 ${FMT_BLUE}Options:${FMT_RESET}
     ${FMT_YELLOW}-i, --vpn-ip${FMT_RESET}                                           IP address of VPN Server.
+    ${FMT_YELLOW}-p, --vpn-port${FMT_RESET}                                         Port of VPN Server.
     ${FMT_YELLOW}-h, --host${FMT_RESET}                                             Hosts to bypass VPN (e.g., $(fmt_code "koin.works")).
     ${FMT_YELLOW}-a, --ip${FMT_RESET}                                               CIDRs to bypass VPN, ensure to add VPN server IP address as well.
     ${FMT_YELLOW}-d, --dns${FMT_RESET}                                              DNS resikver for mappung domain names to IP address (default: $(fmt_code "1.1.1.1")).
@@ -218,9 +221,7 @@ apply_rules() {
   echo_blue "Do you want to proceed? (Y/n): "
   read -r answer
   if [ "$answer" = "Y" ] || [ "$answer" = 'y' ] || [ -z "$answer" ]; then
-    # echo "$fw_rules" | pfctl -Fae -f -
-    # echo "$fw_rules" | pfctl -a $anchor_name -mf -
-    echo "$fw_rules" | pfctl -a $anchor_name -Fmf -
+    echo "$fw_rules" | pfctl -a $anchor_name -mf -
   else
       echo_yellow "  ABORTED"
   fi
@@ -232,14 +233,14 @@ start() {
   # Find default public interface. If using WiFi, it's usually "en0".
   ext_iface=$(route -n get -net default | grep interface | awk '{print $2}' ||  echo "en0")
   # vpn_ip=$(scutil --nc show Ivacy | grep 'CommRemoteAddress' | cut -d' ' -f 5)
-  
+
   info "Using default interface \"${ext_iface}\""
-  
+
   if [ ! -z "$ENABLE_ROUTING" ]; then
     gateway=$(netstat -nr | grep default | grep "$ext_iface" | awk '{print $2}' | head -1)
     info "Using gateway \"${gateway}\""
     info "Resolving domains..."
- 
+
     if [[ ${#HOSTS[@]} -gt 0 ]]; then
       for website in ${HOSTS[*]}; do
         debug "Resolving $website"
@@ -259,6 +260,10 @@ start() {
       route -n add -net "$ip" "$gateway"
     done
   fi
+
+  ifconfig ${ext_iface} down
+  route flush
+  ifconfig ${ext_iface} up
 
   # Disable pf
   pfctl -d 2>/dev/null || true
@@ -291,63 +296,46 @@ EOF
   # Create a pflog interface and monitor all packets logged on it:
   # tcpdump -lnettt -i pflog0
   # tcpdump -lnettt -r /var/log/pflog
- if [ -z "$(ifconfig -l | grep pflog)" ]; then
-    ifconfig pflog create
-    ifconfig pflog0 up
+  log_iface="$(ifconfig -v | grep -e "^pflog" | awk 'BEGIN {FS = ":";} { print $1 }' | head -n1 | tail -n1)"
+  monitor_iface="$(ifconfig -v | grep -e "^pflog" | awk 'BEGIN {FS = ":";} { print $1 }' | head -n2 | tail -n1)"
+  block_iface="$(ifconfig -v | grep -e "^pflog" | awk 'BEGIN {FS = ":";} { print $1 }' | head -n3 | tail -n1)"
+  if [ -z "$log_iface" ]; then
+    log_iface=$(ifconfig pflog create)
   fi
-  
+  if [ -z "$monitor_iface" ] || [ "$monitor_iface" == "$log_iface"  ]; then
+    monitor_iface=$(ifconfig pflog create)
+  fi
+  if [ -z "$block_iface" ] || [ "$monitor_iface" == "$block_iface"  ]; then
+    block_iface=$(ifconfig pflog create)
+  fi
+  ifconfig $log_iface up
+  ifconfig $monitor_iface up
+  ifconfig $block_iface up
+
   # load a pf config equal to "set skip on lo0" + /etc/pf.conf + anchor "dotybitmask"
   debug "Applying rules..." "$rules"
-  echo -e "$rules" | pfctl -f -
+  echo -e "$rules" | pfctl -ef -
 
+  info "Patch rules.." "${SCRIPT_DIR}/pf.anchors/vpn.force.rules"
   add_rule "$(
-    cat pf.anchors/vpn.force.rules \
+    cat ${SCRIPT_DIR}/pf.anchors/vpn.force.rules \
       | sed "7s/^vpn_ip \=.*$/vpn_ip = \"${VPN_IP[*]}\"/" \
-      | sed "10s/^ext_iface \=.*$/ext_iface = \"${ext_iface}\"/" \
-      | sed "13s/^table <gateways>.*$/table <gateways> const { $(echo "${UTUN_IFACE[*]}" | sed "s/ /, /") }/" 
+      | sed "7s/^vpn_port \=.*$/vpn_port = \"${VPN_PORT[*]}\"/" \
+      | sed "11s/^ext_iface \=.*$/ext_iface = \"${ext_iface}\"/" \
+      | sed "13s/^log_iface \=.*$/log_iface = \"${log_iface}\"/" \
+      | sed "14s/^monitor_iface \=.*$/monitor_iface = \"${monitor_iface}\"/" \
+      | sed "15s/^block_iface \=.*$/block_iface = \"${block_iface}\"/" \
+      | sed "17s/^table <gateways>.*$/table <gateways> const { $(echo "${UTUN_IFACE[*]}" | sed "s/ /, /") }/" \
+      | sed "s/ utun_iface / ${UTUN_IFACE[*]} /"
   )"
 
   apply_rules || error "Unable to apply rules"
   echo
+  info "Current states"
   pfctl -s all
-
-  exit 0
-
-  # Reset the gateway table if any
-  add_rule "table <gateways> const { $(echo "${UTUN_IFACE[*]}" | sed "s/ /, /") }"
-  #pfctl -a ${anchor_name} -t gateways -T delete
-  #for gateway in $*; do
-    #pfctl -a ${anchor_name} -t gateways -T add $gateway
-  #done
-
-  # Include "log" keyword in each rule that you want to view.
-  # Block and log everything by default
-  #add_rule "block drop log all"
-  #add_rule "block out log on $ext_iface all"
-  #add_rule "block in log on $ext_iface all"
-  #add_rule "block return-rst out log on $ext_iface proto tcp all"
-  #add_rule "block return-rst in log on $ext_iface proto tcp all"
-  #add_rule "block return-icmp out log on $ext_iface proto udp all"
-  #add_rule "block return-icmp in log on $ext_iface proto udp all"
-  # add_rule "pass out log on egress inet from (egress) to any"
-
-  # Filtering
-  # Antispoof
-  add_rule "antispoof log quick for { lo0 $ext_iface }"
-
-  # Block all traffick on default interface
-  add_rule "block out log on $ext_iface all"
-  # Allow traffic to gateways
-  add_rule "pass out log on $ext_iface to <gateways>"
-  # Allow traffic to local networks over the default interface
-  add_rule "pass out log on $ext_iface to $ext_iface:network"
-  # Block all DNS, except to the gateway
-  add_rule "block out log proto udp to any port 53"
-  add_rule "pass out log proto udp to <gateways> port 53"
-  
-  apply_rules || error "Unable to apply rules"
   echo
-  pfctl -s all
+  info "All loaded rules"
+  pfctl -a '*' -sr
 
   # Useful command to check what traffic is going out from wifi without VPN
   # iftop -i en0
@@ -355,11 +343,12 @@ EOF
 
 # Status
 status() {
-  cnt=$(pfctl -a $anchor_name -s rules 2>/dev/null | wc -l) 
+  cnt=$(pfctl -a $anchor_name -s rules 2>/dev/null | wc -l)
   info "Rules loaded $cnt"
 
+  pfctl -a '*' -sr
   pfctl -a $anchor_name -s rules
-  pfctl -a $anchor_name -s info 
+  pfctl -a $anchor_name -s info
 }
 
 # Stop firewall
@@ -367,6 +356,9 @@ stop() {
   info "Stopping..."
   # Flush everything from anchor
   pfctl -a $anchor_name -F all
+  pfctl -ef /etc/pf.conf
+
+  status
 }
 
 __commands=""
@@ -418,7 +410,12 @@ case $__commands in
         shift
         shift
         ;;
-      -a | --ip)
+      -p | --vpn-port)
+        VPN_PORT+=("$2")
+        shift
+        shift
+        ;;
+     -a | --ip)
         IP_ADDRESSES+=("$2")
         shift
         shift
@@ -443,14 +440,14 @@ case $__commands in
         ;;
       esac
     done
-  
+
     if [[ ${#VPN_IP[@]} -eq 0 ]]; then
       error "missing required ${FMT_BOLD}VIP address of VPN server${FMT_RESET}"
       echo
       help
       exit 2
     fi
-  
+
     if [[ ${#UTUN_IFACE[@]} -eq 0 ]]; then
       error "missing required ${FMT_BOLD}Vutun interface gateways${FMT_RESET}"
       echo
