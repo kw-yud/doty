@@ -142,3 +142,5 @@ if [[ "${OSTYPE}" == darwin* ]]; then
 	[ -r "$__maliases_file" ] && [ -f "$__maliases_file" ] && source "$__maliases_file";
 	unset __maliases_file;
 fi
+
+alias decodejwt="jq -R 'split(\".\") | {\"headers\": .[0] | @base64d | fromjson, \"body\": .[1] | @base64d | fromjson}'"
