@@ -1,0 +1,105 @@
+# Block all non-VPN traffic
+
+# VPN network
+# $vpn_net == utun4/24 when Tunnelblick creates utun4
+# vpn_net = "10.18.0/24"  # utun4 interface doesn't exist at boot time
+# IP address of VPN server
+vpn_ip = ""
+# Internal interface; use the command `ifconfig -a` or:
+# $ ifconfig | pcregrep -M -o '^[^\t:]+:([^\n]|\n\t)*status: active' | egrep -o -m 1 '^[^\t:]+'
+ext_iface = "en0"
+# Use a list in case Tunnelblick creates multiples utun interfaces
+# utun_iface = { utun4 }
+table <gateways> const $utun_iface
+
+# Filtering
+# Antispoof
+antispoof log quick for { lo0 $ext_iface }
+
+# Block and log everything by default
+# Include "log" keyword in each rule that you want to view.
+# Debugging rules:
+# $ sudo ifconfig pflog0 create
+# $ sudo tcpdump -n -e -ttt -i pflog0
+# $ sudo ifconfig pflog0 destroy
+# pass quick log (all, to pflog0) all
+block drop log (all, to pflog0) all
+#block drop log all
+# Block all traffick on default interface
+block out log on $ext_iface all
+block in log on $ext_iface all
+block return-rst out log on $ext_iface proto tcp all
+block return-rst in log on $ext_iface proto tcp all
+block return-icmp out log on $ext_iface proto udp all
+block return-icmp in log on $ext_iface proto udp all
+#pass out log on egress inet from (egress) to any
+
+# Block to/from illeagl destinations or sources
+block in log quick from no-route to any
+block drop in log quick from urpf-failed to any
+# This is observed on macOS
+block drop in log quick on $ext_iface from any to 255.255.255.255
+
+# Whitelist
+# table <whitelist> const { $domainname_tld }
+# pass in quick from <whitelist>
+# pass out quick to <whitelist>
+
+# Open Source IP blocks
+# Refresh with pfctl -a blockips -T load -f /opt/local/etc/macos-fortress/blockips.conf
+# anchor 'blockips' label "Open Source IP Blocks"
+# load anchor 'blockips' from '/opt/local/etc/macos-fortress/blockips.conf'
+
+# Block brute force attacks
+table <bruteforce> persist
+block drop log quick from <bruteforce>
+
+# Pass packets that go through TUN interfaces
+pass out log on $ext_iface to <gateways>"
+#pass on quick <gateways> all
+
+# Pass packets that go to/from VPN Server
+#pass in on $ext_iface proto { tcp udp } from $vpn_ip
+#pass out on $ext_iface proto { tcp udp } from any to $vpn_ip
+pass on $ext_iface proto { tcp, udp } from any to $vpn_ip # Alternate
+
+# Allow access to local networks over the default interface
+table <local-networks> const { 172.16.0.0/12 192.168.0.0/16 }
+# pass out on en0 proto { tcp udp } from any to <local-networks>
+block in log quick on $ext_iface from $ext_iface:network
+pass out log on $ext_iface to $ext_iface:network
+
+# ICMP (ping)
+icmp_types = "echoreq"
+pass on log $ext_iface inet proto icmp all icmp-type $icmp_types
+# pass on $ext_iface inet proto icmp all icmp-type 8 code 0
+# pass out proto icmp from any to any
+
+# DHCP
+#pass inet proto udp from port 68 to port 67
+#pass inet proto udp from port 67 to port 68
+# pass on $ext_iface proto { tcp, udp } from any port 67:68 # Alternate
+
+# DNS
+# Block all DNS, except to the gateway
+block out log proto udp to any port 53
+pass out proto udp to <gateways> port 53
+# pass out inet proto { tcp udp } from any to any port 53
+
+# Broadcast
+# pass from any to 255.255.255.255 keep state
+# pass from 255.255.255.255 to any keep state
+
+# Allow application-specific traffic over these interfaces
+# multicast DNS
+pass proto udp from any to 224.0.0.0/4 keep state
+pass proto udp from 224.0.0.0/4 to any keep state
+pass on $ext_iface proto { udp, tcp } to { 224.0.0.2, 224.0.0.18, 224.0.0.251 } port mdns
+pass on $ext_iface proto igmp to { 224.0.0.1, 224.0.0.22, 224.0.0.251 }
+
+# Test config files
+# anchor "vpn.force"
+# load anchor "vpn.force" from "/etc/pf.anchors/vpn.force.rules"
+#
+# pfctl -n -v -f vpn.force.pf.conf
+# pfctl -Fae -f vpn.force.pf.conf
