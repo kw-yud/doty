@@ -54,6 +54,7 @@ if [[ -z $plugins ]]; then
         nodenv
         npm
         nvm
+        pfctl
         # pop
         pre-commit
         # pyenv
@@ -145,10 +146,3 @@ HIST_STAMPS="yyyy-mm-dd"
 
 source "${ZSH}/oh-my-zsh.sh"
 
-# Load the local shell dotfiles, and then some:
-[[ -f "${HOME}/.zsh_path" ]] && source "${HOME}/.zsh_path"
-[[ -f "${HOME}/.zsh_prompt" ]] && source "${HOME}/.zsh_prompt"
-[[ -f "${HOME}/.zsh_exports" ]] && source "${HOME}/.zsh_exports"
-[[ -f "${HOME}/.zsh_aliases" ]] && source "${HOME}/.zsh_aliases"
-[[ -f "${HOME}/.zsh_functions" ]] && source "${HOME}/.zsh_functions"
-[[ -f "${HOME}/.zsh_extra" ]] && source "${HOME}/.zsh_extra"
