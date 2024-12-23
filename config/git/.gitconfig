@@ -237,7 +237,7 @@
 
     # Find out who is currently active on the repository
     # Displays committers in descending order of number of commits
-    who = shortlog --numbered --summary --email --no-merges --since="3 months"
+    who = shortlog --numbered --summary --email --no-merges --since '3 months'
 
     # List contributors with number of commits.
     contributors = shortlog --summary --numbered
