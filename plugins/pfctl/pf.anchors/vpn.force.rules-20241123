@@ -1,0 +1,142 @@
+# Block all non-VPN traffic
+
+# VPN network
+# $vpn_net == utun4/24 when Tunnelblick creates utun4
+# vpn_net = "10.18.0/24"  # utun4 interface doesn't exist at boot time
+# IP address of VPN server
+vpn_ip = ""
+vpn_port = ""
+# Internal interface; use the command `ifconfig -a` or:
+# $ ifconfig | pcregrep -M -o '^[^\t:]+:([^\n]|\n\t)*status: active' | egrep -o -m 1 '^[^\t:]+'
+ext_iface = "en0"
+# The interface of the logger
+log_iface = "pflog0"
+monitor_iface = "pflog1"
+block_iface = "pflog2"
+# Use a list in case Tunnelblick creates multiples utun interfaces
+table <gateways> const $utun_iface
+
+# Filtering
+# Antispoof
+antispoof log quick for { lo0 $ext_iface }
+
+# Block all traffick on default interface
+# TODO: Is this still needed?
+# block drop log (all, to $log_iface) all
+
+# Block all traffick on default interface
+block log (to $monitor_iface) on $ext_iface all
+block return-rst out on $ext_iface proto tcp all
+block return-rst in on $ext_iface proto tcp all
+block return-icmp out on $ext_iface proto udp all
+block return-icmp in on $ext_iface proto udp all
+# pass out log on egress inet from (egress) to any
+
+# Block to/from illeagl destinations or sources
+block in log (to $log_iface)  quick from no-route to any
+block drop in log (to $log_iface) quick from urpf-failed to any
+# This is observed on macOS
+block drop in log (to $log_iface) quick on $ext_iface from any to 255.255.255.255
+
+# Whitelist
+# table <whitelist> const { $vpn_ip }
+# pass in log (to $monitor_iface) quick proto { udp } from <whitelist>
+# pass out log (to $monitor_iface) quick proto { udp } to <whitelist>
+
+# Open Source IP blocks
+# Refresh with pfctl -a blockips -T load -f /opt/local/etc/macos-fortress/blockips.conf
+# anchor 'blockips' label "Open Source IP Blocks"
+# load anchor 'blockips' from '/opt/local/etc/macos-fortress/blockips.conf'
+
+# Block brute force attacks
+table <bruteforce> persist
+block drop log (to $log_iface) quick from <bruteforce>
+
+# Pass packets that go/from through TUN interfaces
+# TODO: Findout what kinds of this packet
+# pass out quick on { utun_iface } proto { tcp udp } to $vpn_ip port $vpn_port
+# pass out quick on { utun_iface } proto { tcp udp } to port { 443 }
+pass out quick on { utun_iface } all
+# TODO: ???
+# - 151.101.192.106 10.18.0.10  TLSv1.3 1464  151.101.192.106 [block utun4/14] Server Hello, Change Cipher Spec, Application Data
+# pass in quick on { utun_iface } proto { tcp udp } from port { 443 }
+# pass in quick log (to $monitor_iface) on { utun_iface } all
+#pass in log (to $monitor_iface) on $ext_iface from <gateways> # TODO: Need to check
+#pass out quick on $ext_iface to <gateways>
+# Pass packets that go from VPN Server
+# pass quick on <gateways> all # Alternate
+# pass quick on $ext_iface from <gateways> to <gateways>
+# pass out log on egress inet from (egress) to any # Alternate
+# pass in log (to $monitor_iface) on $ext_iface proto { tcp udp } from $vpn_ip # Alternate
+# pass out log (to $monitor_iface) on $ext_iface proto { tcp udp } from any to $vpn_ip # Alternate
+pass log (to $monitor_iface) on $ext_iface proto { tcp, udp } from any to $vpn_ip # Alternate
+
+# Allow access to local networks over the default interface
+table <local-networks> const { 172.16.0.0/12 192.168.0.0/16 }
+# pass out on en0 proto { tcp udp } from any to <local-networks>
+# pass in log (to $monitor_iface) quick on $ext_iface from $ext_iface:network # TODO: Need to check
+block in log (to $log_iface) quick on $ext_iface from $ext_iface:network # TODO: Need to check
+# pass out log (to $monitor_iface) on $ext_iface to $ext_iface:network # TODO: Need to check
+
+# ICMP (ping)
+icmp_types = "echoreq"
+pass quick on $ext_iface inet proto icmp all icmp-type $icmp_types
+# pass quick on $ext_iface inet proto icmp all icmp-type 8 code 0
+# pass quick on $ext_iface inet proto icmp from any to $vpn_ip 
+# pass out proto icmp from any to any
+
+# SSH
+block in log (to $monitor_iface) proto tcp from any to port 22
+
+# DHCP
+# pass inet proto udp from port 68 to port 67
+# pass inet proto udp from port 67 to port 68
+# TODO: Probably need to move this before `block drop in quick`
+# Quirks: We may need to receive at non-obvious broadcast addresses for DHCPv4
+# pass on log (to $monitor_iface) $ext_interface proto { tcp, udp } from any port 67:68
+# pass quick log (to $monitor_iface) inet proto udp from any port 67 to any port 68
+
+# DNS
+# Block all DNS, except to the gateway
+block out log (to $block_iface) proto udp to any port 53
+pass out proto udp to <gateways> port 53
+# pass out inet proto { tcp udp } from any to any port 53
+
+# NTP
+# TODO: ???
+# e.g. 17.253.34.131 10.18.0.10  NTP 140 auper2-ntp-002.aaplimg.com  [pass utun4/14] NTP Version 4, server
+#      Internet Protocol Version 4, Src: auper2-ntp-002.aaplimg.com (17.253.34.131), Dst: 10.18.0.10 (10.18.0.10)
+#
+# block return in proto { tcp udp } from port { 123 }
+
+# Mac-Telnet
+# TODO: ???
+# e.g. 92.168.0.245 255.255.255.255 MAC-Telnet  114 192.168.0.245 [block en0/14] Direction: Client->Server Type: Acknowledge
+#      92.168.0.245 255.255.255.255 MAC-Telnet  114 192.168.0.245 [block en0/14] Direction: Client->Server Type: Data
+#      User Datagram Protocol, Src Port: 62776 (62776), Dst Port: 20561 (20561)
+# pass from any port { 62776 }  to 255.255.255.255 port { 20561 } keep state
+
+# Broadcast
+# pass from any to 255.255.255.255 keep state
+# pass from 255.255.255.255 to any keep state
+
+# Allow application-specific traffic over these interfaces
+# multicast DNS
+pass proto udp from any to 224.0.0.0/4 keep state # TODO: Need to check
+pass proto udp from 224.0.0.0/4 to any keep state # TODO: Need to check
+pass on $ext_iface proto { udp, tcp } to { 224.0.0.2, 224.0.0.18, 224.0.0.251 } port mdns
+pass on $ext_iface proto igmp to { 224.0.0.1, 224.0.0.22, 224.0.0.251 }
+# pass in proto { tcp, udp } from any to port { 5353 5354 8612 }
+
+# BLOCK EVERYTHING
+# Include "log" keyword in each rule that you want to view.
+# Debugging rules:
+# $ sudo ifconfig pflog0 create
+# $ sudo tcpdump -n -e -ttt -i pflog0
+# $ sudo ifconfig pflog0 destroy
+block return log (all, to $block_iface) quick all # TODO: Why?
+
+# TODO:
+# - 192.168.0.219 255.255.255.255 UDP 120 192.168.0.219 [block en0/14] Port: 49427 → 22222
+# - 192.168.0.219 255.255.255.255 UDP 175 192.168.0.219 [block en0/14] Port: 10004 → 10004
+# - 192.168.0.219 255.255.255.255 UDP 106 192.168.0.219 [block en0/14] Port: 49432 → enpc(3289)

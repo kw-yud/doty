@@ -1,0 +1,33 @@
+# Safely and easily force all traffic through a VPN on OSX
+
+# IP address of VPN server
+vpn_ip = "34.101.69.92"
+default_iface = "en0"
+utun_iface = { utun0 utun1 utun2 utun3 utun4 }
+
+table <multicast> const { 0.0.0.0, 224.0.0.0/4, 255.255.255.255. ::/128, ff00::/8 }
+table <link>      const { 127.0.0.0/8, 169.254.0.0/16, fe00::/64 }
+
+# NOTE: You may need exceptions to get out of captive portals
+#pass quick from any to 192.168.123.0/24 
+
+# First, allow all traffic through the VPN!
+pass quick on $utun_iface
+
+# Let us talk to ourselves and receive traffic. That should be safe.
+pass quick from any to { (en0), (en1), (en2) }
+
+# Allow all outbound required traffic to the VPN server
+pass out quick proto tcp from any to $vpn_ip port 22    # SSH (for SOCKS)
+pass out quick proto tcp from any to $vpn_ip port 443   # HTTP (for SOCKS/Proxy/Config/etc)
+pass out quick proto udp from any to $vpn_ip port 500   # ISAKMP
+pass out quick proto udp from any to $vpn_ip port 4500  # IPSec-NAT-T
+
+# Allow non-unicast and link-local traffic
+pass quick from any to { <multicast>, <link> }
+
+# Quirks: We may need to receive at non-obvious broadcast addresses fro DHCPv4
+pass in quick inet proto udp from any port 67 to any port 68
+
+# BLOCK EVERYTHING
+block return quick log all
