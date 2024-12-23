@@ -12,6 +12,21 @@
 [[ -d "${DOTY_DEVELOPMENT_CACHE_DIRECTORY}" ]] || mkdir -p "${DOTY_DEVELOPMENT_CACHE_DIRECTORY}"
 [[ -d "${DOTY_DEVELOPMENT_SDK_DIRECTORY}" ]] || mkdir -p "${DOTY_DEVELOPMENT_SDK_DIRECTORY}"
 
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Load the local shell dotfiles, and then some:
+[[ -f "${HOME}/.zsh_path" ]] && source "${HOME}/.zsh_path"
+[[ -f "${HOME}/.zsh_prompt" ]] && source "${HOME}/.zsh_prompt"
+[[ -f "${HOME}/.zsh_exports" ]] && source "${HOME}/.zsh_exports"
+[[ -f "${HOME}/.zsh_aliases" ]] && source "${HOME}/.zsh_aliases"
+[[ -f "${HOME}/.zsh_functions" ]] && source "${HOME}/.zsh_functions"
+[[ -f "${HOME}/.zsh_extra" ]] && source "${HOME}/.zsh_extra"
+
 # Load the local shell dotfiles, and then some:
 [[ -f "${DOTFILES_LOCAL_DIRECTORY}/path" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/path"
 [[ -f "${DOTFILES_LOCAL_DIRECTORY}/bash_prompt" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/bash_prompt"
@@ -146,3 +161,6 @@ HIST_STAMPS="yyyy-mm-dd"
 
 source "${ZSH}/oh-my-zsh.sh"
 
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ -f "${HOME}/.p10k.zsh" ]] && source "${HOME}/.p10k.zsh"
+[[ -f "${HOME}/.zsh_p10k" ]] && source "${HOME}/.zsh_p10k"
