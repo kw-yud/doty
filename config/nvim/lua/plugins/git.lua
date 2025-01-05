@@ -60,5 +60,8 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
+    config = function()
+      require("doty.plugins.lazygit")
+    end,
   },
 }
