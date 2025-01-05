@@ -10,6 +10,12 @@ return {
     "mfussenegger/nvim-dap",
     main = "dap",
     lazy = true,
+    dependencies = {
+      "jbyuki/one-small-step-for-vimkind",
+    },
+    config = function()
+      require("doty.plugins.nvim-dap")
+    end,
   },
   {
     "rcarriga/nvim-dap-ui",
@@ -18,6 +24,9 @@ return {
       "mfussenegger/nvim-dap",
       "nvim-neotest/nvim-nio",
     },
+    config = function()
+      require("doty.plugins.nvim-dap-ui")
+    end,
   },
   {
     "theHamsta/nvim-dap-virtual-text",
@@ -25,10 +34,13 @@ return {
       "mfussenegger/nvim-dap",
       "nvim-treesitter/nvim-treesitter",
     },
+    config = function()
+      require("doty.plugins.nvim-dap-virtual-text")
+    end,
   },
 
   --  Adaparter configuration for specific languages
   -- "leoluz/nvim-dap-go",
   -- "mfussenegger/nvim-dap-python",
-  -- "jbyuki/one-small-step-for-vimkind"
+  "jbyuki/one-small-step-for-vimkind",
 }
