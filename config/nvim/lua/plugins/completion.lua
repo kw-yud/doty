@@ -1,16 +1,34 @@
 return {
   {
     "hrsh7th/nvim-cmp",
-    name = "cmp",
+    main = "cmp",
+    -- load cmp on InsertEnter
+    event = "InsertEnter",
+    -- these dependencies will only be loaded when cmp loads
+    -- dependencies are always lazy-loaded unless specified otherwise
+    dependencies = {
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-nvim-lua",
+      "hrsh7th/cmp-path",
+      "saadparwaiz1/cmp_luasnip",
+      "VonHeikemen/lsp-zero.nvim",
+    },
     config = function()
-      require("doty.plugins.cmp")
-      require("doty.plugins.cmp_gh")
-    end
-  }, { "hrsh7th/cmp-buffer" }, { "hrsh7th/cmp-path" }, { "hrsh7th/cmp-nvim-lua" },
+      require("doty.plugins.nvim-cmp")
+    end,
+  },
+  { "hrsh7th/cmp-buffer" },
   { "hrsh7th/cmp-nvim-lsp" },
+  { "hrsh7th/cmp-nvim-lua" },
+  { "hrsh7th/cmp-path" },
   { "saadparwaiz1/cmp_luasnip", dependencies = { "L3MON4D3/LuaSnip" } },
-  { "tamago324/cmp-zsh" }
-  -- {"onsails/lspkind-nvim"},
-  -- AI based
-  -- { "codota/tabnine-nvim", build = "/Users/koinworks/.local/share/nvim/lazy/tabnine-nvim/dl_binaries.sh" },
+  {
+    "tamago324/cmp-zsh",
+    config = function()
+      require("doty.plugins.nvim-cmp-zsh")
+    end,
+  },
+  { "L3MON4D3/LuaSnip" }, -- auto generate code
+  -- {'rafamadriz/friendly-snippets'},
 }

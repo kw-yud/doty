@@ -1,13 +1,31 @@
 return {
-  { "mfussenegger/nvim-dap",           name = "dap" },
   {
     "nvim-telescope/telescope-dap.nvim",
-    dependencies = { "mfussenegger/nvim-dap" }
-  }, {
-  "rcarriga/nvim-dap-ui",
-  name = "dapui",
-  dependencies = { "mfussenegger/nvim-dap" }
-}, { "theHamsta/nvim-dap-virtual-text", name = "nvim-dap-virtual-text" },
+    lazy = true,
+    dependencies = {
+      "mfussenegger/nvim-dap",
+    },
+  },
+  {
+    "mfussenegger/nvim-dap",
+    main = "dap",
+    lazy = true,
+  },
+  {
+    "rcarriga/nvim-dap-ui",
+    main = "dapui",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+      "nvim-neotest/nvim-nio",
+    },
+  },
+  {
+    "theHamsta/nvim-dap-virtual-text",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+      "nvim-treesitter/nvim-treesitter",
+    },
+  },
 
   --  Adaparter configuration for specific languages
   -- "leoluz/nvim-dap-go",

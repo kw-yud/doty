@@ -1,6 +1,6 @@
 local neogit = require("neogit")
 
-neogit.setup {
+neogit.setup({
   disable_signs = false,
   disable_hint = false,
   disable_context_highlighting = false,
@@ -44,7 +44,7 @@ neogit.setup {
     -- { CLOSED, OPENED }
     section = { ">", "v" },
     item = { ">", "v" },
-    hunk = { "", "" }
+    hunk = { "", "" },
   },
   -- Integrations are auto-detected, and enabled if available, but can be disabled by setting to "false"
   integrations = {
@@ -64,7 +64,7 @@ neogit.setup {
     --   }
     -- }
     --
-    diffview = true
+    diffview = true,
   },
   -- Setting any section to `false` will make the section not render at all
   sections = {
@@ -74,7 +74,7 @@ neogit.setup {
     stashes = { hidden = true },
     unpulled = { folded = true, hidden = false },
     unmerged = { folded = false, hidden = false },
-    recent = { hidden = true }
+    recent = { hidden = true },
   },
   -- override/add mappings
   mappings = {
@@ -90,8 +90,8 @@ neogit.setup {
     --     -- Binds <cr> to trigger select action
     --     ["<cr>"] = "select",
     -- }
-  }
-}
+  },
+})
 
 -- hi NeogitNotificationInfo guifg=#80ff95
 -- hi NeogitNotificationWarning guifg=#fff454
@@ -112,4 +112,4 @@ vim.g.lazygit_floating_window_use_plenary = 0 -- use plenary.nvim to manage floa
 vim.g.lazygit_use_neovim_remote = 1 -- fallback to 0 if neovim-remote is not installed
 
 vim.g.lazygit_use_custom_config_file_path = 0 -- config file path is evaluated if this value is 1
-vim.g.lazygit_config_file_path = '' -- custom config file path
+vim.g.lazygit_config_file_path = "" -- custom config file path

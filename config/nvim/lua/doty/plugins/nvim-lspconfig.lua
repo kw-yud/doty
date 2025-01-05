@@ -1,63 +1,64 @@
-local lsp_zero = require('lsp-zero')
 local lsp_status = require("lsp-status")
-local navbuddy = require("nvim-navbuddy")
--- Setup language servers.
+local lsp_zero = require("lsp-zero")
 local lspconfig = require("lspconfig")
 local masonlspconfig = require("mason-lspconfig")
+--Enable (broadcasting) snippet capability for completion
+local capabilitiesSnippet = vim.lsp.protocol.make_client_capabilities()
+capabilitiesSnippet.textDocument.completion.completionItem.snippetSupport = true
 
--- lspconfig.util.default_config()
--- lspconfig.util.ensure_installed()
--- lspconfig.util.ensure_attached()
+-- Set up default language servers capabilities.
+lsp_zero.extend_lspconfig()
 
-lspconfig.util.on_setup = lspconfig.util.add_hook_after(lspconfig.util.on_setup, function(config)
-  if config.name == 'lua_ls' then
-    -- workaround for nvim's incorrect handling of scopes in the workspace/configuration handler
-    -- https://github.com/folke/neodev.nvim/issues/41
-    -- https://github.com/LuaLS/lua-language-server/issues/1089
-    -- https://github.com/LuaLS/lua-language-server/issues/1596
-    -- https://github.com/LuaLS/lua-language-server/issues/1596#issuecomment-1855087288
-    config.handlers = vim.tbl_extend('error', {}, config.handlers)
-    config.handlers['workspace/configuration'] = function(...)
-      local _, result, ctx = ...
-      local client_id = ctx.client_id
-      local client = vim.lsp.get_client_by_id(client_id)
-      if client and client.workspace_folders and #client.workspace_folders then
-        if result.items and #result.items > 0 then
-          if not result.items[1].scopeUri then
-            return vim.tbl_map(function(_) return nil end, result.items)
+-- Register the progress handler
+lsp_status.register_progress()
+
+lspconfig.util.on_setup = lspconfig.util.add_hook_after(
+  lspconfig.util.on_setup,
+  function(config, user_config)
+    if config.name == "lua_ls" then
+      -- workaround for nvim's incorrect handling of scopes in the workspace/configuration handler
+      -- https://github.com/folke/neodev.nvim/issues/41
+      -- https://github.com/LuaLS/lua-language-server/issues/1089
+      -- https://github.com/LuaLS/lua-language-server/issues/1596
+      -- https://github.com/LuaLS/lua-language-server/issues/1596#issuecomment-1855087288
+      config.handlers = vim.tbl_extend("error", {}, config.handlers)
+      config.handlers["workspace/configuration"] = function(...)
+        local _, result, ctx = ...
+        local client_id = ctx.client_id
+        local client = vim.lsp.get_client_by_id(client_id)
+        if
+            client
+            and client.workspace_folders
+            and #client.workspace_folders
+        then
+          if result.items and #result.items > 0 then
+            if not result.items[1].scopeUri then
+              return vim.tbl_map(function(_)
+                return nil
+              end, result.items)
+            end
           end
         end
-      end
 
-      return vim.lsp.handlers['workspace/configuration'](...)
+        return vim.lsp.handlers["workspace/configuration"](...)
+      end
     end
   end
-end)
+)
 
-masonlspconfig.setup_handlers {
+masonlspconfig.setup_handlers({
   lsp_zero.default_setup,
-  lspconfig.lua_ls.setup {
+  -- setup Shell scripts
+  lspconfig.bashls.setup({
     settings = {
-      Lua = {
-        diagnostics = { globals = { "vim" } },
-        workspace = {
-          library = vim.api.nvim_get_runtime_file("", true),
-          checkThirdParty = false,
-          hint = { enable = true },
-          telemetry = { enable = false }
-        }
-      }
-    }
-  },
-  lspconfig.jsonls.setup {
-    settings = {
-      json = {
-        -- schema = require('schemastore').json.schemas(),
-        validate = { enable = true }
-      }
-    }
-  },
-  lspconfig.gopls.setup {
+      bashIde = {
+        globPattern = "*@(.sh|.zsh|.inc|.bash|.command)",
+      },
+    },
+  }),
+
+  -- setup Golang
+  lspconfig.gopls.setup({
     settings = {
       gopls = {
         gofumpt = true,
@@ -69,7 +70,7 @@ masonlspconfig.setup_handlers {
           test = true,
           tidy = true,
           upgrade_dependency = true,
-          vendor = true
+          vendor = true,
         },
         hints = {
           assignVariableTypes = true,
@@ -78,145 +79,143 @@ masonlspconfig.setup_handlers {
           constantValues = true,
           functionTypeParameters = true,
           parameterNames = true,
-          rangeVariableTypes = true
+          rangeVariableTypes = true,
         },
         analyses = {
           fieldalignment = true,
           nilness = true,
           unusedparams = true,
           unusedwrite = true,
-          useany = true
+          useany = true,
         },
         usePlaceholders = true,
         completeUnimported = true,
         staticcheck = true,
         directoryFilters = {
-          "-.git", "-.vscode", "-.idea", "-.vscode-test",
-          "-node_modules"
-        }
-      }
-    }
-  },
-  lspconfig.terraformls.setup {
-    cmd = { "terraform-ls", "serve" },
-    filetypes = { "terraform", "tf", "terraform-vars" },
-    -- root_dir = lspconfig.util.root_pattern(".terraform", ".git"),
-    root_dir = lspconfig.util.root_pattern("*.tf", "*.terraform",
-      "*.tfvars", "*.hcl", "*.config")
-  },
-  lspconfig.clangd.setup {
-    handlers = lsp_status.extensions.clangd.setup(),
-    init_options = { clangdFileStatus = true },
-    on_attach = function(client, bufnr)
-      navbuddy.attach(client, bufnr)
-      lsp_status.on_attach(client, bufnr)
-    end,
-    capabilities = lsp_status.capabilities
-  },
-  -- lspconfig.robotframework_ls.setup {
-  --   pythonpath = "~/.pyenv/shims/python"
-  -- },
-  -- setup helm-ls
-  lspconfig.helm_ls.setup {
-    settings = { ['helm-ls'] = { yamlls = { path = "yaml-language-server" } } }
-  },                         -- setup yamlls
-  lspconfig.yamlls.setup {}, -- lspconfig.pyls_ms.setup {
-  --     handlers = lsp_status.extensions.pyls_ms.setup(),
-  --     settings = {python = {workspaceSymbols = {enabled = true}}},
-  --     on_attach = lsp_status.on_attach,
-  --     capabilities = lsp_status.capabilities
-  -- },
-  -- lspconfig.ghcide.setup {
-  --     on_attach = lsp_status.on_attach,
-  --     capabilities = lsp_status.capabilities
-  -- },
-  -- lspconfig.pyright.setup {},
-  -- lspconfig.tsserver.setup {},
-  lspconfig.rust_analyzer.setup {
+          "-.git",
+          "-.vscode",
+          "-.idea",
+          "-.vscode-test",
+          "-node_modules",
+        },
+      },
+    },
+  }),
+
+  -- Setup JSON
+  lspconfig.jsonls.setup({
+    capabilities = capabilitiesSnippet,
+    settings = {
+      json = {
+        validate = { enable = true },
+      },
+    },
+  }),
+
+  -- Setup Lua
+  lspconfig.lua_ls.setup(lsp_zero.nvim_lua_ls({
+    -- on_init = function(client)
+    --   if client.workspace_folders then
+    --     local path = client.workspace_folders[1].name
+    --     if vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc') then
+    --       return
+    --     end
+    --   end
+
+    --   client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+    --     runtime = {
+    --       -- Tell the language server which version of Lua you're using
+    --       -- (most likely LuaJIT in the case of Neovim)
+    --       version = 'LuaJIT'
+    --     },
+    --     -- Make the server aware of Neovim runtime files
+    --     workspace = {
+    --       checkThirdParty = false,
+    --       -- Pull in all of 'runtimepath'. NOTE: this is a lot slower and will cause issues when working on your own configuration (see https://github.com/neovim/nvim-lspconfig/issues/3189)
+    --       library = vim.api.nvim_get_runtime_file("", true)
+    --     }
+    --   })
+    -- end,
+    -- Setup lua_ls and enable call snippets
+    settings = {
+      Lua = {
+        completion = {
+          callSnippet = "Replace",
+        },
+      },
+    },
+  })),
+
+  -- Setup Rust
+  lspconfig.rust_analyzer.setup({
     -- Server-specific settings. See `:help lspconfig-setup`
-    on_attach = lsp_status.on_attach,
-    capabilities = lsp_status.capabilities,
     settings = {
       ["rust-analyzer"] = {
-        lens = { enable = true },
         cargo = {
           allFeatures = true,
           loadOutDirsFromCheck = true,
-          runBuildScripts = true
+          runBuildScripts = true,
+        },
+        diagnostics = {
+          enable = true,
+        },
+        lens = {
+          enable = true,
         },
         -- Add clippy lints for Rust.
         check = {
           enable = true,
           allFeatures = true,
           command = "clippy",
-          extraArgs = { "--no-deps" }
+          extraArgs = { "--no-deps" },
         },
         procMacro = {
           enable = true,
           ignored = {
             ["async-trait"] = { "async_trait" },
             ["napi-derive"] = { "napi" },
-            ["async-recursion"] = { "async_recursion" }
-          }
-        }
-      }
-    }
-  }
-}
+            ["async-recursion"] = { "async_recursion" },
+          },
+        },
+      },
+    },
+  }),
 
-lspconfig.pylsp.setup({
-  settings = {
-    pylsp = {
-      plugins = {
-        pycodsyle = {
-          ignore = { 'W391', 'E501' },
-          maxLineLength = 120
-        }
-      }
-    }
-  }
+  -- Setup YAML
+  lspconfig.yamlls.setup({
+    settings = {
+      yaml = {
+        schemaStore = {
+          -- You must disable built-in schemaStore support if you want to use
+          -- this plugin and its advanced options like `ignore`.
+          enable = false,
+          -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+          url = "",
+        },
+      },
+    },
+  }),
+
+  -- lspconfig.postgres_lsp.setup { },
+
+  -- lspconfig.robotframework_ls.setup {
+  --   pythonpath = os.getenv("PYENV_ROOT") .. "/shims/python"
+  -- },
+
+  -- lspconfig.pyls_ms.setup {
+  --   handlers = lsp_status.extensions.pyls_ms.setup(),
+  --   settings = {
+  --     python = {
+  --       workspaceSymbols = { enabled = true },
+  --     },
+  --   },
+  -- },
+
+  -- lspconfig.pyright.setup {},
+  -- lspconfig.clangd.setup {
+  --   handlers = lsp_status.extensions.clangd.setup(),
+  --   init_options = {
+  --     clangdFileStatus = true
+  --   },
+  -- },
 })
-
--- lspconfig.robotframework_ls.setup({
---   pythonpath = os.getenv("PYENV_ROOT") .. "/shims/python"
--- })
-
--- Global mappings.
--- See `:help vim.diagnostic.*` for documentation on any of the below functions
--- vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
--- vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
--- vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
--- vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
-
--- -- Use LspAttach autocommand to only map the following keys
--- -- after the language server attaches to the current buffer
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-  callback = function(ev)
-    --         -- Enable completion triggered by <c-x><c-o>
-    --         vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-
-    --         -- Buffer local mappings.
-    --         -- See `:help vim.lsp.*` for documentation on any of the below functions
-    --         local opts = {buffer = ev.buf}
-    --         vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    --         vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    --         vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    --         vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    --         vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-    --         vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
-    --         vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder,
-    --                        opts)
-    --         vim.keymap.set('n', '<space>wl', function()
-    --             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    --         end, opts)
-    --         vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
-    --         vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
-    --         vim.keymap.set({'n', 'v'}, '<space>ca', vim.lsp.buf.code_action, opts)
-    --         vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set('n', '<space>f',
-      function() vim.lsp.buf.format { async = true } end, {})
-  end
-})
-
-vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]

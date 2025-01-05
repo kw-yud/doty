@@ -1,6 +1,4 @@
-local ok, barbecue = pcall(require, "barbecue")
-if not ok then return end
-
+local barbecue = require("barbecue")
 local cfg = require("doty.config")
 local icons = cfg.icons
 local symbols = cfg.symbols
@@ -12,7 +10,7 @@ barbecue.setup({
   ---Whether to attach navic to language servers automatically.
   ---
   ---@type boolean
-  attach_navic = false, -- prevent barbecue from automatically attaching nvim-navic
+  attach_navic = true, -- prevent barbecue from automatically attaching nvim-navic
 
   ---Whether to create winbar updater autocmd.
   ---
@@ -42,7 +40,7 @@ barbecue.setup({
     ---See: `:help filename-modifiers`
     ---
     ---@type string
-    basename = ""
+    basename = "",
   },
 
   ---Whether to display path to file.
@@ -101,7 +99,7 @@ barbecue.setup({
   ---Theme to be used for generating highlight groups dynamically.
   ---
   ---@type barbecue.Config.theme
-  theme = "auto",
+  theme = "tokyonight",
 
   ---Whether context text should follow its icon's color.
   ---
@@ -122,7 +120,7 @@ barbecue.setup({
     ---Entry separator.
     ---
     ---@type string
-    separator = symbols.separator
+    separator = symbols.separator,
   },
 
   ---@alias barbecue.Config.kinds
@@ -158,17 +156,19 @@ barbecue.setup({
     Struct = icons.struct,
     Event = icons.event,
     Operator = icons.operator,
-    TypeParameter = icons.typeParameter
-  }
+    TypeParameter = icons.typeParameter,
+  },
 })
 
 vim.api.nvim_create_autocmd({
-  "WinScrolled",   -- or WinResized on NVIM-v0.9 and higher
-  "BufWinEnter",   --
-  "CursorHold",    --
-  "InsertLeave",   --
-  "BufModifiedSet" -- include this if you have set `show_modified` to `true`
+  "WinScrolled",    -- or WinResized on NVIM-v0.9 and higher
+  "BufWinEnter",    --
+  "CursorHold",     --
+  "InsertLeave",    --
+  "BufModifiedSet", -- include this if you have set `show_modified` to `true`
 }, {
   group = vim.api.nvim_create_augroup("barbecue.updater", {}),
-  callback = function() require("barbecue.ui").update() end
+  callback = function()
+    require("barbecue.ui").update()
+  end,
 })

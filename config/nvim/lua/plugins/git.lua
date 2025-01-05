@@ -2,37 +2,63 @@ return {
   {
     -- Git
     "NeogitOrg/neogit",
-    name = "neogit",
     dependencies = {
-      'nvim-lua/plenary.nvim',  -- required
+      "nvim-lua/plenary.nvim",  -- required
       "sindrets/diffview.nvim", -- optional - Diff integration
 
       -- Only one of these is needed, not both.
       "nvim-telescope/telescope.nvim", -- optional
       -- "ibhagwan/fzf-lua",              -- optional
     },
-    config = function() require("doty.plugins.neogit") end
-  }, {
-  -- Super fast git decorations implemented purely in Lua
-  "lewis6991/gitsigns.nvim",
-  name = "gitsigns",
-  dependencies = { "folke/trouble.nvim" },
-  config = function() require("doty.plugins.gitsigns") end
-}, "rhysd/git-messenger.vim", "rhysd/committia.vim", -- Sweet commit messages
+    config = function()
+      require("doty.plugins.neogit")
+    end,
+  },
+  {
+    -- Super fast git decorations implemented purely in Lua
+    "lewis6991/gitsigns.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "tjdevries/colorbuddy.nvim",
+      "folke/trouble.nvim",
+    },
+    config = function()
+      require("doty.plugins.git-signs")
+    end,
+  },
+  {
+    "rhysd/git-messenger.vim",
+    event = "VeryLazy",
+    config = function()
+      require("doty.plugins.git-messenger")
+    end,
+  },
+  "rhysd/committia.vim", -- Sweet commit messages
   {
     -- Sweet diff helper
     "sindrets/diffview.nvim",
-    name = "diffview",
-    config = function() require("doty.plugins.diffview") end
-  }, -- "Rawnly/gist.nvim", -- Gist helper
+    event = "VeryLazy",
+    config = function()
+      require("doty.plugins.git-diffview")
+    end,
+  },
   {
     -- Git blamme
     "f-person/git-blame.nvim",
-    name = "gitblame",
-    dependencies = { "f-person/lua-timeago" }
-  }, {
-  "kdheepak/lazygit.nvim",
-  -- optional for floating window border decoration
-  dependencies = { "nvim-lua/plenary.nvim" }
-}
+    main = "gitblame",
+    lazy = true,
+    dependencies = {
+      "f-person/lua-timeago",
+    },
+    config = function()
+      require("doty.plugins.git-blame")
+    end,
+  },
+  {
+    "kdheepak/lazygit.nvim",
+    -- optional for floating window border decoration
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+  },
 }

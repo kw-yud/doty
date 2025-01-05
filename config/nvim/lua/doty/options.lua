@@ -25,7 +25,7 @@ if g.neovide then
 
   -- g:neovide_transparency should be 0 if you want to unify transparency of content and title bar.
   g.neovide_transparency = 0.0
-  g.transparency = 0.95
+  g.transparency = 0.85
   g.neovide_background_color = "#0f1117" .. alpha()
 
   -- Floating Blur Amount
@@ -54,14 +54,14 @@ g.maplocalleader = ","
 -----------------------------------------------------------
 -- General
 -----------------------------------------------------------
-opt.mouse = 'a'               -- Enable mouse support
-opt.clipboard = 'unnamedplus' -- Copy/paste to system clipboard
--- opt.syntax = 'enable'
+opt.mouse = "a"               -- Enable mouse support
+opt.clipboard = "unnamedplus" -- allows neovim to Copy/paste to system clipboard
+opt.syntax = "enable"
 -- opt.swapfile = false                  -- Don't use swapfile
-opt.completeopt = 'menu,menuone,noinsert,noselect' -- Autocomplete options
-vim.scriptencoding = 'utf-8'
-opt.encoding = 'utf-8'                             -- String-encoding used internally and for RPC communication.
-opt.fileencoding = 'utf-8'                         -- File-content encoding for the current buffer
+opt.completeopt = "menu,menuone,noinsert,noselect" -- Autocomplete options
+vim.scriptencoding = "utf-8"
+opt.encoding = "utf-8"                             -- String-encoding used internally and for RPC communication.
+opt.fileencoding = "utf-8"                         -- File-content encoding for the current buffer
 
 -----------------------------------------------------------
 -- Neovim UI
@@ -70,7 +70,7 @@ opt.number = true          -- Show line number
 opt.relativenumber = false -- Show relative number
 opt.showmatch = true       -- Highlight matching parenthesis
 -- opt.foldmethod = 'marker'   -- Enable folding (default 'foldmarker')
-opt.colorcolumn = '120'    -- Line length marker at 120 columns
+opt.colorcolumn = "120"    -- Line length marker at 120 columns
 -- opt.splitright = true       -- Vertical split to the right
 -- opt.splitbelow = true       -- Horizontal split to the bottom
 -- opt.ignorecase = true       -- Ignore case letters when search
@@ -81,7 +81,7 @@ opt.laststatus = 3       -- Set global statusline
 opt.scrolloff = 5        -- Minimal number of screen lines to keep above and below the cursor
 opt.sidescrolloff = 5    -- The minimal number of screen columns to keep to the left and to the right of the cursor if 'nowrap' is set.
 opt.wrap = false
-opt.whichwrap = 'b,s,<,>,[,]'
+opt.whichwrap = "b,s,<,>,[,]"
 -- opt.guicursor="n-v-c:ver25,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 
 -- mouse
@@ -97,14 +97,14 @@ opt.ignorecase = true -- Ignore case in search patterns.
 opt.smartcase = true  -- Override the 'ignorecase' option if the search pattern contains upper-case characters.
 opt.list = true       -- List mode: By default, show tabs as ">", trailing spaces as "-", and non-breakable space characters as "+".
 opt.cursorline = true -- Highlight the text line of the cursor with CursorLine hl-CursorLine.
-opt.signcolumn = 'yes'
+opt.signcolumn = "yes"
 opt.listchars = {
-  tab = '',
-  trail = '⭘', -- ·
-  lead = '·',
-  extends = '»',
-  precedes = '«',
-  nbsp = '×'
+  tab = "",
+  trail = "⭘", -- ·
+  lead = "·",
+  extends = "»",
+  precedes = "«",
+  nbsp = "×",
 }
 
 -- -----------------------------------------------------------
@@ -123,7 +123,7 @@ opt.smartindent = true -- Autoindent new lines
 -- -- Memory, CPU
 -- -----------------------------------------------------------
 -- opt.hidden = true           -- Enable background buffers
--- opt.history = 100           -- Remember N lines in history
+opt.history = 100 -- Remember N lines in history
 -- opt.lazyredraw = true       -- Faster scrolling
 -- opt.synmaxcol = 240         -- Max column for syntax highlight
 opt.updatetime = 250    -- ms to wait for trigger an event
@@ -139,11 +139,24 @@ vim.bo.autoread = true
 -----------------------------------------------------------
 -- Command completion
 -----------------------------------------------------------
-opt.wildignore = opt.wildignore + {
-  '*/node_modules/*', '*/.git/*', '*/vendor/*', '*.docx', '*.jpg', '*.png',
-  '*.gif', '*.pdf', '*.pyc', '*.exe', '*.flv', '*.img', '*.xlsx', '*DS_STORE',
-  '*.db'
-}
+opt.wildignore = opt.wildignore
+    + {
+      "*/node_modules/*",
+      "*/.git/*",
+      "*/vendor/*",
+      "*.jpg",
+      "*.png",
+      "*.gif",
+      "*.img",
+      "*.flv",
+      "*.docx",
+      "*.pdf",
+      "*.xlsx",
+      "*DS_STORE",
+      "*.db",
+      "*.pyc",
+      "*.exe",
+    }
 
 -----------------------------------------------------------
 -- Startup
@@ -151,13 +164,42 @@ opt.wildignore = opt.wildignore + {
 -- opt.shortmess:append("sI") -- Disable nvim intro
 opt.shortmess:append("c") -- Don't show the dumb matching stuff.
 
+-- Disable context_commentstring nvim-treesitter module to speed up loading",
+-- as nvim-ts-context-commentstring is alreadey initialized separately.
+vim.g.skip_ts_context_commentstring_module = true
+
 -- Disable builtin plugins
 local disabled_built_ins = {
-  "2html_plugin", "getscript", "getscriptPlugin", "gzip", "logipat", "netrw",
-  "netrwPlugin", "netrwSettings", "netrwFileHandlers", "matchit", "tar",
-  "tarPlugin", "rrhelper", "spellfile_plugin", "vimball", "vimballPlugin",
-  "zip", "zipPlugin", "tutor", "toHtml", "rplugin", "synmenu", "optwin",
-  "compiler", "bugreport", "ftplugin"
+  "2html_plugin",
+  "bugreport",
+  "compiler",
+  -- "ftplugin",
+  "getscript",
+  "getscriptPlugin",
+  "gzip",
+  "logipat",
+  "matchit",
+  -- disable netrw at the very start of your init.lua
+  "netrw",
+  "netrwPlugin",
+  "netrwSettings",
+  "netrwFileHandlers",
+  "optwin",
+  "remote_plugins",
+  "rplugin",
+  "rrhelper",
+  "spellfile_plugin",
+  "synmenu",
+  "tar",
+  "tarPlugin",
+  "toHtml",
+  "tutor",
+  "vimball",
+  "vimballPlugin",
+  "zip",
+  "zipPlugin",
 }
 
-for _, plugin in pairs(disabled_built_ins) do g["loaded_" .. plugin] = 1 end
+for _, plugin in pairs(disabled_built_ins) do
+  g["loaded_" .. plugin] = 1
+end

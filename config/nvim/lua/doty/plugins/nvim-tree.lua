@@ -1,33 +1,40 @@
-local cfg = require("doty.config")
-local icons = cfg.icons
+local icons = require("doty.config").icons
 
 require("nvim-tree").setup({
-  sort_by = "case_sensitive",
-  actions = { open_file = { quit_on_open = true } },
-  update_focused_file = { enable = true, update_cwd = true },
-  filters = { custom = { '^.git$', '^node_modules$' } },
-  git = { enable = false },
-  log = { enable = true, types = { diagnostics = true } },
+  actions = {
+    open_file = {
+      quit_on_open = false,
+    },
+  },
   diagnostics = {
     enable = true,
     show_on_dirs = false,
     debounce_delay = 50,
-    icons = { hint = '', info = '', warning = '', error = '' }
+    icons = {
+      hint = icons.hint,
+      info = icons.info,
+      warning = icons.warning,
+      error = icons.error,
+    },
   },
 
-  view = { width = 45, number = true, relativenumber = true },
+  view = {
+    width = 40,
+    number = true,
+    relativenumber = false,
+  },
   -- respect_buf_cwd = true,
   renderer = {
-    group_empty = false,
+    group_empty = true,
     highlight_git = true,
     special_files = {},
     icons = {
       glyphs = {
-        default = '',
+        default = "",
         symlink = icons.symlink,
         git = icons.git.state,
-        folder = icons.folder
-      }
-    }
-  }
+        folder = icons.folder,
+      },
+    },
+  },
 })

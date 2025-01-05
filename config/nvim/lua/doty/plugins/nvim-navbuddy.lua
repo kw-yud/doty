@@ -1,9 +1,9 @@
-local navbuddy = require("nvim-navbuddy")
 local actions = require("nvim-navbuddy.actions")
 local cfg = require("doty.config")
+local navbuddy = require("nvim-navbuddy")
 local icons = cfg.icons
 
-navbuddy.setup {
+navbuddy.setup({
   window = {
     border = "single", -- "rounded", "double", "solid", "none"
     -- or an array with eight chars building up the border in a clockwise fashion
@@ -14,21 +14,25 @@ navbuddy.setup {
     sections = {
       left = {
         size = "20%",
-        border = nil -- You can set border style for each section individually as well.
+        border = nil, -- You can set border style for each section individually as well.
       },
       mid = { size = "40%", border = nil },
       right = {
         -- No size option for right most section. It fills to
         -- remaining area.
         border = nil,
-        preview = "leaf" -- Right section can show previews too.
+        preview = "leaf", -- Right section can show previews too.
         -- Options: "leaf", "always" or "never"
-      }
-    }
+      },
+    },
   },
   node_markers = {
     enabled = true,
-    icons = { leaf = "  ", leaf_selected = " → ", branch = " " }
+    icons = {
+      leaf = "  ",
+      leaf_selected = " ❯ ",
+      branch = " ",
+    },
   },
   icons = {
     File = icons.file .. " ",
@@ -56,21 +60,20 @@ navbuddy.setup {
     Struct = icons.struct .. " ",
     Event = icons.event .. " ",
     Operator = icons.operator .. " ",
-    TypeParameter = icons.typeParameter .. " "
+    TypeParameter = icons.typeParameter .. " ",
   },
-  use_default_mappings = true, -- If set to false, only mappings set
+  use_default_mappings = false, -- If set to false, only mappings set
   -- by user are set. Else default
   -- mappings are used for keys
   -- that are not set by user
   mappings = {
-    ["<esc>"] = actions.close(), -- Close and cursor to original location
-    ["q"] = actions.close(),
+    ["<esc>"] = actions.close(),        -- Close and cursor to original location
 
     ["j"] = actions.next_sibling(),     -- down
     ["k"] = actions.previous_sibling(), -- up
 
-    ["h"] = actions.parent(),           -- Move to left panel
-    ["l"] = actions.children(),         -- Move to right panel
+    ["<Left>"] = actions.parent(),      -- Move to left panel
+    ["<Right>"] = actions.children(),   -- Move to right panel
     ["0"] = actions.root(),             -- Move to first panel
 
     ["v"] = actions.visual_name(),      -- Visual selection of name
@@ -100,26 +103,35 @@ navbuddy.setup {
     ["J"] = actions.move_down(), -- Move focused node down
     ["K"] = actions.move_up(),   -- Move focused node up
 
-    ["t"] = actions.telescope({  -- Fuzzy finder at current level.
-      layout_config = {          -- All options that can be
-        height = 0.60,           -- passed to telescope.nvim's
-        width = 0.60,            -- default can be passed here.
+    ["s"] = actions.toggle_preview(),
+
+    ["<C-v>"] = actions.vsplit(),
+    ["<C-s>"] = actions.hsplit(),
+
+    ["t"] = actions.telescope({ -- Fuzzy finder at current level.
+      layout_config = {         -- All options that can be
+        height = 0.60,          -- passed to telescope.nvim's
+        width = 0.60,           -- default can be passed here.
         prompt_position = "top",
-        preview_width = 0.50
+        preview_width = 0.50,
       },
-      layout_strategy = "horizontal"
+      layout_strategy = "horizontal",
     }),
 
-    ["g?"] = actions.help() -- Open mappings help window
+    ["<C-h>"] = actions.help(), -- Open mappings help window
+    -- ["?"] = {
+    --   callback = function() require("which-key").show({ global = false }) end,
+    --   description = "Show mappings",
+    -- },
   },
   lsp = {
     auto_attach = true, -- If set to true, you don't need to manually use attach function
-    preference = nil    -- list of lsp server names in order of preference
+    preference = nil,   -- list of lsp server names in order of preference
   },
   source_buffer = {
     follow_node = true, -- Keep the current node in focus on the source buffer
     highlight = true,   -- Highlight the currently focused node
     reorient = "smart", -- "smart", "top", "mid" or "none"
-    scrolloff = nil     -- scrolloff value when navbuddy is open
-  }
-}
+    scrolloff = nil,    -- scrolloff value when navbuddy is open
+  },
+})

@@ -7,7 +7,10 @@ return {
     plugins = true, -- installed opt or start plugins in packpath
     -- you can also specify the list of plugins to make available as a workspace library
     -- plugins = {
-    --     "nvim-treesitter", "plenary.nvim", "telescope.nvim", "nvim-dap-ui"
+    --     "nvim-treesitter",
+    --     "plenary.nvim",
+    --     "telescope.nvim",
+    --     "nvim-dap-ui",
     -- }
   },
   setup_jsonls = true, -- configures jsonls to provide completion for project specific .luarc.json files
@@ -21,5 +24,5 @@ return {
   lspconfig = true,
   -- much faster, but needs a recent built of lua-language-server
   -- needs lua-language-server >= 3.6.0
-  pathStrict = true
+  pathStrict = true,
 }

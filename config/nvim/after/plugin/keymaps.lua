@@ -1,209 +1,479 @@
+local funcs = require("doty.utils.functions")
 local wk = require("which-key")
+local imap = funcs.imap
+local nmap = funcs.nmap
+local vmap = funcs.vmap
+
+-- close some filetypes with <q>
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("CloseWithQ", { clear = true }),
+  pattern = {
+    "PlenaryTestPopup",
+    "help",
+    "lspinfo",
+    "man",
+    "notify",
+    "startuptime",
+    "checkhealth",
+  },
+  callback = function(event)
+    vim.bo[event.buf].buflisted = false
+    vim.keymap.set(
+      "n",
+      "q",
+      "<cmd>close<cr>",
+      { buffer = event.buf, silent = true }
+    )
+  end,
+})
+
+-- Remap command key
+-- nmap('<leader><leader>', ':')
+-- nmap('<C-p>', ':', {})
+
+-- window
+-- This is going to get me cancelled
+nmap("<C-x>", "<Cmd>x<CR>")
+nmap("<C-c>", "<Cmd>q!<CR>")
+nmap("<C-s>", "<Cmd>w<CR>")
+imap("<C-s>", "<Esc><cmd>w<cr>")
+
+-- Window movement
+-- vim.keymap.set("n", "<C-h>", "<C-w>h")
+-- vim.keymap.set("n", "<C-j>", "<C-w>j")
+-- vim.keymap.set("n", "<C-k>", "<C-w>k")
+-- vim.keymap.set("n", "<C-l>", "<C-w>l")
+-- vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
+-- vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 -- buffer navigation
--- nmap('<leader>bp', ':bprev<cr>', { desc = 'Prev buffer' })
--- nmap('<leader>bn', ':bnext<cr>', { desc = 'Next buffer' })
--- nmap('<leader>bd', ':bdelete<cr>', { desc = 'Delete buffer' })
+wk.add({
+  -- Option - Z
+  { "Ω", "<Cmd>undo<CR>", desc = "Undo", mode = { "i", "n", "v" } },
 
--- tab navigation
--- nmap('<leader>tp', ':tabprevious<cr>', { desc = 'Prev tab' })
--- nmap('<leader>tn', ':tabnext<cr>', { desc = 'Next tab' })
--- nmap('<leader>td', ':tabclose<cr>', { desc = 'Close tab' })
-
--- tab navigation
--- nmap('<leader>tp', ':tabprevious<cr>', { desc = 'Prev tab' })
--- nmap('<leader>tn', ':tabnext<cr>', { desc = 'Next tab' })
--- nmap('<leader>td', ':tabclose<cr>', { desc = 'Close tab' })
-
--- Breadcrumb
-wk.register({
-  ["<leader>ub"] = {
-    function()
-      local off = vim.b['barbecue_entries'] == nil
-      require('barbecue.ui').toggle(off and true or nil)
-    end, "Toogle Breadcrumbs"
-  }
-})
-
--- Lazy plugin management
-wk.register({
-  ["<leader>p"] = {
-    name = "Plugin Management",
-    c = { '<cmd>Lazy check<cr>', 'Check plugins' },
-    u = { '<cmd>Lazy update<cr>', 'Update plugins' },
-    s = { '<cmd>Lazy show<cr>', 'Show plugins' },
-    p = { '<cmd>Lazy profile<cr>', 'Profile' },
-    l = { '<cmd>Lazy logs<cr>', 'Logs' },
-    r = { '<cmd>Lazy restore<cr>', 'Restore plugins from lockfile' },
-    x = { '<cmd>Lazy clear<cr>', 'Clear uninstalled plugins' },
-    h = { '<cmd>Lazy help<cr>', 'Show Help' }
-  }
-})
-
--- Nvim-Tree
-local nvtree_api = require('nvim-tree.api')
-wk.register({
-  ["<leader>e"] = {
-    function()
-      local api = require('nvim-tree.api')
-
-      if api.tree.is_visible then
-        api.tree.open()
-        api.tree.focus()
-      else
-        api.tree.close()
-      end
-    end, "Toggle tree"
+  { "<C-J>", ":m .+1<CR>==", desc = "Move line up", mode = { "n" } },
+  { "<C-K>", ":m .-2<CR>==", desc = "Move line up", mode = { "n" } },
+  {
+    "<C-J>",
+    "<Esc>:m .+1<CR>==<Insert>",
+    desc = "Move line up",
+    mode = { "i" },
   },
-  -- ["q"] = {function() require('nvim-tree.api').tree.close() end, "Close tree"},
-  ["-"] = {
-    function() require('nvim-tree.api').tree.collapse_all() end,
-    "Collapse all tree"
-  }
-})
-
--- nmap('<c-a>', 'gg<S-v>G')
--- nmap('<leader>k', '<cmd>Lspsaga hover_doc<CR>')
--- keymap.set({ 'n', 'v' }, '<leader>ca', '<cmd>Lspsaga code_action<CR>')
--- nmap('gd', '<cmd>Lspsaga goto_definition<CR>')
--- nmap('[d', '<cmd>Lspsaga diagnostic_jump_prev<CR>')
--- nmap(']d', '<cmd>Lspsaga diagnostic_jump_next<CR>')
--- nmap('<leader>o', '<cmd>Lspsaga outline<CR>')
--- nmap('gh', '<cmd>Lspsaga lsp_finder<CR>')
--- nmap('<leader>rn', '<cmd>Lspsaga rename<CR>')
-
--- Cheatsheet through folke/neodev.nvim
-wk.register({ ["<leader>ch"] = { "<cmd>WhichKey<cr>", "Show cheatsheet" } })
-
--- make test for golang
--- nmap('<leader>gt', '<cmd>GoTests<CR>')
-
--- presentation
--- nmap('<leader>pp', '<cmd>PresentingStart<CR>')
--- nmap('n', '<cmd>PresentingNext<CR>')
--- nmap('b', '<cmd>PresentingPrev<CR>')
-
--- Telescope
-wk.register({
-  ["<leader>f"] = {
-    name = "File",
-    n = { "<cmd>enew<cr>", "New File" },
-    f = { "<cmd>Telescope find_files<cr>", "Find File" },
-    r = {
-      "<cmd>Telescope oldfiles<cr>",
-      "Open Recent File",
-      -- additional options for creating the keymap
-      noremap = false
-    }
-  }
-})
-
--- folke/noice.nvim
-wk.register({
-  ["<S-Enter>"] = {
-    function() require('noice').redirect(vim.fn.getcmdline()) end,
-    "Redirect Cmdline",
-    mode = 'c'
+  {
+    "<C-K>",
+    "<Esc>:m .-2<CR>==<Insert>",
+    desc = "Move line up",
+    mode = { "i" },
   },
-  ["<c-f>"] = {
+
+  -- TODO: Keymap not smooth?
+  {
+    "<C-a>",
+    "<Esc><CR>gg<S-v>G",
+    desc = "Select All",
+    mode = { "i", "n", "v" },
+  },
+  {
+    "<C-Del>",
+    "1C",
+    desc = "Delete All Right",
+    mode = { "n", "v" },
+  },
+
+  -- This works in Insert mode: press CTRL-u to make the
+  -- word before the cursor uppercase. Handy to type
+  -- words in lowercase and then make them uppercase.
+  {
+    "gU",
+    desc = "Transform to Uppercase",
+    noremap = true,
+    mode = { "n", "v" },
+  },
+  {
+    "gUgU",
+    desc = "Transform Line to Uppercase",
+    noremap = true,
+    mode = { "n", "v" },
+  },
+  {
+    "gu",
+    desc = "Transform to Lowercase",
+    noremap = true,
+    mode = { "n", "v" },
+  },
+  {
+    "gugu",
+    desc = "Transform Line to Lowercase",
+    noremap = true,
+    mode = { "n", "v" },
+  },
+
+  -- Tab Groups navigation
+  {
+    "<leader>bn",
+    "<Cmd>bnext<CR>",
+    desc = "Buffer: Next",
+    mode = { "n", "v" },
+  },
+  {
+    "<leader>bp",
+    "<Cmd>bprev<CR>",
+    desc = "Buffer: Previous",
+    mode = { "n", "v" },
+  },
+  {
+    "<leader>bd",
+    "<Cmd>bdelete<CR>",
+    desc = "Buffer: Close current",
+    mode = { "n", "v" },
+  },
+  {
+    "<C-PageUp>",
+    "<Cmd>tabnext<CR>",
+    desc = "View: Go to next tab",
+    noremap = true,
+  },
+  {
+    "<C-PageDown>",
+    "<Cmd>tabprevious<CR>",
+    desc = "View: Go to previous tab",
+    noremap = true,
+  },
+  -- { '<C-w>', '<Cmd>tabclose<CR>', desc = 'View: Close current tab', noremap = true },
+})
+
+-- WhichKey ---------------------------------------------------------
+wk.add({
+  {
+    "<C-h>",
+    "<Cmd>WhichKey<CR>",
+    desc = "Open Keyboard Shortcuts (which-key)",
+    mode = { "n", "i", "v" },
+  },
+})
+
+-- Lazy plugin management -------------------------------------------
+wk.add({
+  { "<leader>p",  group = "Plugin Management" },
+  { "<leader>pc", "<Cmd>Lazy check<CR>",      desc = "Check plugins" },
+  { "<leader>pu", "<Cmd>Lazy update<CR>",     desc = "Update plugins" },
+  { "<leader>ps", "<Cmd>Lazy show<CR>",       desc = "Show plugins" },
+  { "<leader>pp", "<Cmd>Lazy profile<CR>",    desc = "Profile" },
+  { "<leader>pl", "<Cmd>Lazy log<CR>",        desc = "Logs" },
+  {
+    "<leader>pr",
+    "<Cmd>Lazy restore<CR>",
+    desc = "Restore plugins from lockfile",
+  },
+  { "<leader>px", "<Cmd>Lazy clear<CR>", desc = "Clear uninstalled plugins" },
+  { "<leader>ph", "<Cmd>Lazy help<CR>",  desc = "Show Help" },
+})
+
+-- Telescope --------------------------------------------------------
+wk.add({
+  -- Files
+  { "<leader>f",  group = "File" },
+  {
+    "<leader>fB",
+    "<cmd>Telescope file_browser grouped=true<cr>",
+    desc = "File browser",
+  },
+  { "<leader>fn", "<Cmd>new<CR>",                  desc = "New file" },
+  { "<leader>ff", "<Cmd>Telescope find_files<CR>", desc = "Find files" },
+  {
+    "<leader>fr",
+    "<Cmd>Telescope oldfiles<CR>",
+    desc = "Open recent file ('.' for repeat)",
+    noremap = false,
+  },
+  { "<leader>fj", "<Cmd>Telescope jumplist<CR>",  desc = "Jump list" },
+  { "<leader>fg", "<Cmd>Telescope live_grep<CR>", desc = "Search in files" },
+  { "<leader>fb", "<Cmd>Telescope buffers<CR>",   desc = "Lists open buffers" },
+  { "<leader>fm", "<Cmd>Telescope marks<CR>",     desc = "Marks" },
+  {
+    "<leader>fs",
+    "<Cmd>Telescope grep_string<CR>",
+    desc = "Select Current Word",
+  },
+
+  -- Search
+  { "<leader>s",  group = "Search" },
+  {
+    "<leader>sb",
+    "<Cmd>Telescope builtin<CR>",
+    desc = "Search Select Telescope",
+  },
+  {
+    "<leader>sB",
+    "<cmd>Telescope current_buffer_fuzzy_find<cr>",
+    desc = "Search in buffer",
+  },
+  { "<leader>sc", "<Cmd>Telescope commands<CR>", desc = "Commands" },
+  {
+    "<leader>sf",
     function()
-      if not require('noice.lsp').scroll(4) then return '<c-f>' end
+      require("telescope.builtin").grep_string({
+        shorten_path = true,
+        word_match = "-w",
+        only_sort_text = true,
+        search = "",
+      })
     end,
-    'Scroll forward',
-    silent = true,
-    expr = true,
-    mode = { 'i', 'n', 's' }
+    desc = "Fuzzy search",
   },
-  ["<c-b>"] = {
+  {
+    "<leader>sH",
+    "<Cmd>Telescope command_history<CR>",
+    desc = "Command history",
+  },
+  { "<leader>sh", "<Cmd>Telescope heading<CR>",     desc = "Headings" },
+  { "<leader>sd", "<Cmd>Telescope diagnostics<CR>", desc = "Diagnostics" },
+  { "<leader>sk", "<Cmd>Telescope keymaps<CR>",     desc = "Keymaps" },
+  { "<leader>sO", "<Cmd>Telescope vim_options<CR>", desc = "Vim Options" },
+  { "<leader>sp", "<Cmd>Telescope projects<CR>",    desc = "Projects" },
+  { "<leader>sr", "<Cmd>Telescope resume<CR>",      desc = "Search Resume" },
+  { "<leader>sS", "<Cmd>Telescope symbols<CR>",     desc = "Emoji" },
+  {
+    "<leader>s:",
+    "<Cmd>Telescope search_history<CR>",
+    desc = "Search History",
+  },
+  -- Shortcut for searching your neovim configuration files
+  {
+    "<leader>sN",
     function()
-      if not require('noice.lsp').scroll(-4) then
-        return '<c-b>'
-      end
+      -- You can pass additional configuration to telescope to change theme, layout, etc.
+      require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") })
     end,
-    'Scroll backward',
-    silent = true,
-    expr = true,
-    mode = { 'i', 'n', 's' }
+    desc = "Search Neovim files",
   },
-  ["<leader>sn"] = {
-    l = { function() require('noice').cmd('last') end, 'Noice Last Message' },
-    h = { function() require('noice').cmd('history') end, 'Noice History' },
-    a = { function() require('noice').cmd('all') end, 'Noice All' }
-  }
-})
-
--- rcarriga/nvim-notify
-wk.register({
-  ['<leader>un'] = {
+  -- Slightly advanced example of overriding default behavior and theme
+  {
+    "<leader>/",
     function()
-      require('notify').dismiss({ silent = true, pending = true })
-    end, 'Dismiss all Notifications'
-  }
-})
-
--- Trouble
-wk.register({
-  ["<leader>x"] = {
-    name = "Trouble",
-    x = { "<cmd>TroubleToggle<cr>", "Toggle trouble" },
-    w = {
-      "<cmd>TroubleToggle workspace_diagnostics<cr>",
-      "Diagnostics workspace"
-    },
-    d = {
-      "<cmd>TroubleToggle document_diagnostics<cr>",
-      "Diagnostics document"
-    },
-    l = { "<cmd>TroubleToggle loclist<cr>", "List" },
-    f = { "<cmd>TroubleToggle quickfix<cr>", "Quick fix" }
+      -- You can pass additional configuration to telescope to change theme, layout, etc.
+      require("telescope.builtin").current_buffer_fuzzy_find(
+        require("telescope.themes").get_dropdown({
+          winblend = 10,
+          previewer = false,
+        })
+      )
+    end,
+    desc = "Fuzzily search in current buffer",
   },
-  ["gR"] = { "<cmd>TroubleToggle lsp_references<cr>", "LSP reference" }
+  -- Also possible to pass additional configuration options.
+  --  See `:help telescope.builtin.live_grep()` for information about particular keys
+  {
+    "<leader>s/",
+    function()
+      -- You can pass additional configuration to telescope to change theme, layout, etc.
+      require("telescope.builtin").live_grep({
+        grep_open_files = true,
+        prompt_title = "Live Grep in Open Files",
+      })
+    end,
+    desc = "Search in Open Files",
+  },
+
+  -- DAP
+  { "<leader>d",  group = "DAP" },
+  {
+    "<leader>db",
+    "<cmd>Telescope dap list_breakpoints<cr>",
+    desc = "List Breakpoints",
+  },
+  { "<leader>dc", "<cmd>Telescope dap commands<cr>", desc = "Commands" },
+  {
+    "<leader>do",
+    "<cmd>Telescope dap configurations<cr>",
+    desc = "Configurations",
+  },
+  { "<leader>dv", "<cmd>Telescope dap variables<cr>", desc = "Variables" },
+  { "<leader>df", "<cmd>Telescope dap frames<cr>",    desc = "Frames" },
+
+  -- Make
+  { "<leader>m",  group = "Make" },
+  { "<leader>mm", "<cmd>Telescope make<cr>",          desc = "Run make" },
+
+  -- Other
+  { "<leader>qq", "<Cmd>Telescope Quickfix<CR>",      desc = "Quickfix" },
+  {
+    "<leader>?",
+    "<Cmd>Telescope help_tags<CR>",
+    desc = "Lists available help tags",
+  },
 })
 
----- Neogit ---------------------------------
-
--- vim.fn["gina#custom#command#option"]('status', '--opener', 'vsplit')
--- nnoremap { '<leader>gs', '<cmd>Gina status<CR>' }
-
-wk.register({
-  ["<leader>g"] = {
-    name = "Git",
-    d = { "<cmd>DiffviewOpen<cr>", "Git diff" },
-    s = { function() require("neogit").open() end, "Git show" },
-    c = { function() require("neogit").open { "commit" } end, "Git commit" }
-  }
+-- Nvim-Tree --------------------------------------------------------
+wk.add({
+  { "<leader>e", "<Cmd>NvimTreeToggle<CR>", desc = "NvimTree: Toggle" },
+  -- { "<leader>r", "<Cmd>NvimTreeRefresh<CR>", desc = "NvimTree: Refresh Tree" },
+  -- { "q", "<Cmd>NvimTreeClose<CR>", desc = "NvimTree: Close" },
+  -- { "-", "<Cmd>NvimTreeCollapse<CR>", desc = "NvimTree: Collapse all" },
 })
 
--- TODO: decide mappings for this
--- local nnoremap = vim.keymap.nnoremap
--- nnoremap { "<space>tsw", require("gitsigns").toggle_word_diff }
--- nnoremap { "<space>tsh", require("gitsigns").toggle_word_diff }
+-- Mason ------------------------------------------------------------
+wk.add({
+  { "<leader>X", "<Cmd>Mason<CR>", desc = "Mason: Open status window" },
+})
 
----- Diagnostic ---------------------------------
-wk.register({
-  ["<leader>d"] = {
-    name = "Diagnostic",
-    s = {
-      function() vim.diagnostic.open_float(0, { scope = "line" }) end,
-      "Show diagnostic"
-    },
-    n = {
-      function()
-        vim.diagnostic.goto_next {
-          severity = get_highest_error_severity(),
-          wrap = true,
-          float = true
-        }
-      end, "Next diagnostic"
-    },
-    p = {
-      function()
-        vim.diagnostic.goto_prev {
-          severity = get_highest_error_severity(),
-          wrap = true,
-          float = true
-        }
-      end, "Previous diagnostic"
-    }
-  }
+-- Git --------------------------------------------------------------
+wk.add({
+  { "<leader>g",  group = "Git" },
+  { "<leader>gg", "<cmd>LazyGit<cr>",                desc = "LazyGit Toggle" },
+  { "<leader>gB", "<cmd>Telescope git_branches<cr>", desc = "Branches" },
+  { "<leader>gC", "<cmd>Telescope git_commits<cr>",  desc = "Commits" },
+  {
+    "<leader>gj",
+    "<cmd>lua require 'gitsigns'.next_hunk({navigation_message = false})<cr>",
+    desc = "Next Hunk",
+  },
+  {
+    "<leader>gk",
+    "<cmd>lua require 'gitsigns'.prev_hunk({navigation_message = false})<cr>",
+    desc = "Prev Hunk",
+  },
+  { "<Leader>gm", "<Plug>(git-messenger)",         desc = "Show git message" },
+  {
+    "<leader>gp",
+    "<cmd>lua require 'gitsigns'.preview_hunk()<cr>",
+    desc = "Preview Hunk",
+  },
+  { "<leader>gs", "<cmd>Telescope git_status<cr>", desc = "Status" },
+})
+
+-- Breadcrumb -------------------------------------------------------
+wk.add({
+  {
+    "<leader>bc",
+    function()
+      local off = vim.b["barbecue_entries"] == nil
+      require("barbecue.ui").toggle(off and true or nil)
+    end,
+    desc = "Breadcrumbs: Toggle navigation",
+  },
+})
+
+-- Twilight ---------------------------------------------------------
+wk.add({
+  { "<C-r>", "<Cmd>Twilight<CR>", desc = "Twilight: Toggle" },
+})
+
+-- vim-visual-multi -------------------------------------------------
+-- wk.add({{ "<C-n>", "<Plug>(VM-Select-Operator)", desc = "Select Operator" }})
+
+-- Trouble ----------------------------------------------------------
+wk.add({
+  { "<leader>x", group = "Diagnostics" },
+  {
+    "<leader>xx",
+    "<Cmd>Trouble diagnostics toggle<CR>",
+    desc = "Trouble: Diagnostics",
+  },
+  {
+    "<leader>xd",
+    "<Cmd>Trouble diagnostics toggle filter.buf=0<CR>",
+    desc = "Trouble: Diagnostics document",
+  },
+  {
+    "<leader>xl",
+    "<Cmd>Trouble loclist toggle<CR>",
+    desc = "Trouble: Location list",
+  },
+  {
+    "<leader>xf",
+    "<Cmd>Trouble quickfix toggle<CR>",
+    desc = "Trouble: Quick fix...",
+  },
+  {
+    "<leader>xq",
+    "<Cmd>Trouble qflist toggle<CR>",
+    desc = "Trouble: Quickfix list",
+  },
+  {
+    "<leader>xs",
+    "<Cmd>Trouble symbols toggle focus=false<CR>",
+    desc = "Trouble: Symbols",
+  },
+  {
+    "<leader>xr",
+    "<Cmd>Trouble lsp toggle focus=false win.position=right<CR>",
+    desc = "Trouble: LSP definitions/references/...",
+  },
+  {
+    "gR",
+    "<Cmd>Trouble lsp_references toggle<CR>",
+    desc = "Trouble: LSP reference",
+  },
+
+  -- See `:help vim.diagnostic.*` for documentation on any of the below functions
+  {
+    "<leader>xD",
+    function()
+      vim.diagnostic.open_float(0, { scope = "line" })
+    end,
+    desc = "Diagnostics: Show",
+  },
+  {
+    "<leader>xL",
+    vim.diagnostic.setloclist,
+    desc = "Diagnostics: Set loc list",
+  },
+  {
+    "[d",
+    function()
+      vim.diagnostic.goto_next({
+        severity = get_highest_error_severity(),
+        wrap = true,
+        float = true,
+      })
+    end,
+    desc = "Diagnostics: Next",
+  },
+  {
+    "]d",
+    function()
+      vim.diagnostic.goto_prev({
+        severity = get_highest_error_severity(),
+        wrap = true,
+        float = true,
+      })
+    end,
+    desc = "Diagnostics: Previous",
+  },
+})
+
+-- rcarriga/nvim-notify ---------------------------------------------
+wk.add({
+  {
+    "<leader>nn",
+    function()
+      require("notify").dismiss({ silent = true, pending = true })
+    end,
+    desc = "Notification: Dismiss all",
+  },
+})
+
+-- LSP --------------------------------------------------------------
+wk.add({
+  { "cc", group = "Comment" },
+  {
+    "<leader>ln",
+    "<Cmd>NavBuddy<CR>",
+    desc = "NavBuddy: Show symbol navigation",
+  },
+  -- toggle completion menu
+  -- If the completion menu is visible it cancels the process.
+  -- Else, it triggers the completion menu.
+  {
+    "<C-Space>",
+    "<Cmd>lua require('cmp').complete()<CR>",
+    desc = "Show auto-complete suggestion",
+    mode = { "i" },
+  },
+})
+
+-- ZenMode ----------------------------------------------------------
+wk.add({
+  { "Z", "<Cmd>ZenMode<CR>", desc = "ZenMode: Toggle", mode = { "n" } },
 })

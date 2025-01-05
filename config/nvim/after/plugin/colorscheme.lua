@@ -1,21 +1,3 @@
--- Set colorscheme after options
-require("colorbuddy").colorscheme "tokyonight-night"
-require("colorizer").setup({
-  '*', -- Highlight all files, but customize some others.
-  'conf',
-  html = { css = true },
-  scss = { css = true },
-  css = { css = true },
-  javascript = { no_names = true }
-}, {
-  RGB = true,         -- #RGB hex codes
-  RRGGBB = true,      -- #RRGGBB hex codes
-  names = true,       -- "Name" codes like Blue
-  RRGGBBAA = true,    -- #RRGGBBAA hex codes
-  -- Available modes: foreground, background
-  mode = 'background' -- Set the display mode.
-})
-
 -- if os.getenv("TERM") =~ '^\(rxvt\|screen\|interix\|putty\)\(-.*\)\?$'
 --     set notermguicolors
 -- elseif os.getenv("TERM") =~ '^\(tmux\|iterm\|vte\|gnome\)\(-.*\)\?$'
@@ -37,3 +19,36 @@ require("colorizer").setup({
 -- vim.cmd('set termguicolors')
 -- vim.cmd('set ft=conf')
 -- vim.api.nvim_command("BufReadPost *.conf setl ft=conf")
+
+-- vim.api.nvim_create_autocmd("ColorScheme", {
+--     pattern = "kanagawa",
+--     callback = function()
+--       if vim.o.background == "light" then
+--         vim.fn.system("kitty +kitten themes Kanagawa_light")
+--       elseif vim.o.background == "dark" then
+--         vim.fn.system("kitty +kitten themes Kanagawa_dragon")
+--       else
+--         vim.fn.system("kitty +kitten themes Kanagawa")
+--       end
+--     end,
+--   })
+
+--   local colors = {
+--     fg = "#76787d",
+--     bg = "#252829",
+--   }
+--   vim.api.nvim_create_autocmd('ColorScheme', {
+--     callback = function()
+--       -- change the background color of floating windows and borders.
+--       vim.cmd('highlight NormalFloat guibg=none guifg=none')
+--       vim.cmd('highlight FloatBorder guifg=' .. colors.fg .. ' guibg=none')
+--       vim.cmd('highlight NormalNC guibg=none guifg=none')
+
+--       -- change neotree background colors
+--       -- Default: NeoTreeNormal  xxx ctermfg=223 ctermbg=232 guifg=#d4be98 guibg=#141617
+--       -- vim.cmd('highlight NeoTreeNormal guibg=#252e33 guifg=none')
+--       -- vim.cmd('highlight NeoTreeFloatNormal guifg=none guibg=none')
+--       -- vim.cmd('highlight NeoTreeFloatBorder gui=none guifg=' .. colors.fg .. ' guibg=none')
+--       -- vim.cmd('highlight NeoTreeEndOfBuffer guibg=#252e33') -- 1d2021
+--     end,
+--   })

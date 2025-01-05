@@ -1,84 +1,132 @@
 return {
   {
-    -- Adds file type icons to Vim plugins
-    "nvim-tree/nvim-web-devicons",
-    name = "nvim-web-devicons",
-    opts = function()
-      return require("doty.plugins.nvim-web-devicons")
-    end
-  }, -- TODO: Conditionally only do this for linux
-  {
-    'yamatsum/nvim-nonicons',
-    name = "nvim-nonicons",
-    dependencies = { 'nvim-tree/nvim-web-devicons' }
-  },
-  {
-    'nvim-lualine/lualine.nvim',
-    name = "lualine",
+    "nvim-lualine/lualine.nvim",
     dependencies = {
-      "yamatsum/nvim-nonicons", "nvim-tree/nvim-web-devicons",
-      "folke/tokyonight.nvim", "Shatur/neovim-ayu",
-      "f-person/git-blame.nvim"
+      "yamatsum/nvim-nonicons",
+      "nvim-tree/nvim-web-devicons",
+      "f-person/git-blame.nvim",
+      "tjdevries/colorbuddy.nvim",
+      "folke/trouble.nvim",
     },
-    opts = function() return require("doty.plugins.lualine") end
+    opts = function()
+      return require("doty.plugins.lualine")
+    end,
   },
   {
     "utilyre/barbecue.nvim",
-    name = "barbecue",
-    version = "*",
     dependencies = {
-      "SmiteshP/nvim-navic",         --
+      "SmiteshP/nvim-navic",
       "nvim-tree/nvim-web-devicons", -- optional dependency
-      "folke/tokyonight.nvim"
+      "tjdevries/colorbuddy.nvim",
     },
-    config = function() require("doty.plugins.barbecue") end
+    config = function()
+      require("doty.plugins.barbecue")
+    end,
   },
   {
-    'rcarriga/nvim-notify',
-    event = 'VeryLazy',
-    dependencies = { 'yamatsum/nvim-nonicons' },
-    opts = function() return require("doty.plugins.notify") end,
-    init = function()
-      -- When noice is not enabled, install notify on VeryLazy
-      local fn = require('doty.utils.functions')
-      if not fn.has('noice.nvim') then
-        fn.on_very_lazy(function()
-          vim.notify = require('notify')
-        end)
-      end
-    end
-  },
-  {
-    'folke/noice.nvim',
-    event = 'VeryLazy',
+    "rcarriga/nvim-notify",
+    main = "notify",
+    event = "VeryLazy",
     dependencies = {
-      'MunifTanjim/nui.nvim', 'rcarriga/nvim-notify',
-      'nvim-treesitter/nvim-treesitter'
+      "yamatsum/nvim-nonicons",
+      "nvim-telescope/telescope.nvim",
     },
-    ---@type NoiceConfig
-    -- opts = function() return require("doty.plugins.noice") end
+    config = function()
+      return require("doty.plugins.nvim-notify")
+    end,
   },
   {
-    'stevearc/dressing.nvim',
-    name = "dressing",
-    init = function()
-      ---@diagnostic disable-next-line: duplicate-set-field
-      vim.ui.select = function(...)
-        require('lazy').load({ plugins = { 'dressing.nvim' } })
-        return vim.ui.select(...)
-      end
-      ---@diagnostic disable-next-line: duplicate-set-field
-      vim.ui.input = function(...)
-        require('lazy').load({ plugins = { 'dressing.nvim' } })
-        return vim.ui.input(...)
-      end
-    end
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+      "nvim-treesitter/nvim-treesitter",
+    },
+  },
+  {
+    "stevearc/dressing.nvim",
+    event = "VeryLazy", -- Load later and are not important for the initial UI
+    config = function()
+      return require("doty.plugins.dressing")
+    end,
   },
   {
     "folke/trouble.nvim",
-    name = "trouble",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = function() return require("doty.plugins.trouble") end
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      return require("doty.plugins.trouble")
+    end,
+  },
+  {
+    "SmiteshP/nvim-navbuddy",
+    dependencies = {
+      "SmiteshP/nvim-navic",
+      "MunifTanjim/nui.nvim",
+    },
+    config = function()
+      return require("doty.plugins.nvim-navbuddy")
+    end,
+  },
+  {
+    "f-person/lua-timeago",
+    lazy = true,
+    config = function()
+      local lang = require("lua-timeago/languages/en")
+      local id = {
+        justnow = "baru saja",
+        minute = {
+          singular = "beberapa menit yang lalu",
+          plural = "menit yang lalu",
+        },
+        hour = { singular = "beberapa jam yang lalu", plural = "jam yang lalu" },
+        day = {
+          singular = "beberapa hari yang lalu",
+          plural = "hari yang lalu",
+        },
+        week = {
+          singular = "beberapa minggu yang lalu",
+          plural = "minggu yang lalu",
+        },
+        month = {
+          singular = "beberapa bulan yang lalu",
+          plural = "bulan yang lalu",
+        },
+        year = {
+          singular = "beberapa tahun yang lalu",
+          plural = "tahun yang lalu",
+        },
+      }
+      require("lua-timeago").set_language(lang)
+    end,
+  },
+  {
+    "j-hui/fidget.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("doty.plugins.fidget")
+    end,
+  },
+  {
+    "glepnir/dashboard-nvim",
+    main = "dashboard",
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    event = "VimEnter",
+    config = function()
+      return require("doty.plugins.dashboard")
+    end,
+  },
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    event = "VeryLazy",
+    config = function()
+      return require("doty.plugins.indent-blankline")
+    end,
   },
   -- {
   -- Remove all background colors to make nvim transparent
@@ -88,56 +136,30 @@ return {
   --    config = function() require("doty.plugins.transparent") end
   -- },
   {
-    "SmiteshP/nvim-navbuddy",
-    name = "nvim-navbuddy",
-    dependencies = { "SmiteshP/nvim-navic", "MunifTanjim/nui.nvim", "neovim/nvim-lspconfig",
-      "numToStr/Comment.nvim",        -- Optional
-      "nvim-telescope/telescope.nvim" -- Optional
+    "folke/twilight.nvim",
+    dependencies = {
+      "folke/zen-mode.nvim",
     },
-    config = function() return require("doty.plugins.nvim-navbuddy") end
-  },
-  {
-    "f-person/lua-timeago",
-    name = "lua-timeago",
+    event = "VeryLazy",
     config = function()
-      local lang = require('lua-timeago/languages/en')
-      require('lua-timeago').set_language(lang)
-    end
+      return require("doty.plugins.twilight")
+    end,
   },
   {
-    "j-hui/fidget.nvim",
-    tag = 'legacy',
-    config = function() require('doty.plugins.fidget') end
+    "folke/zen-mode.nvim",
+    event = "VeryLazy",
+    opts = function()
+      return require("doty.plugins.zen-mode")
+    end,
   },
   {
-    'glepnir/dashboard-nvim',
-    name = "dashboard",
-    event = 'VimEnter',
-    config = function()
-      require('dashboard').setup {
-        theme = 'doom',           --  theme is doom and hyper default is hyper
-        disable_move = false,     --  default is false disable move keymap for hyper
-        shortcut_type = "number", --  shortcut type 'letter' or 'number'
-        -- change_to_vcs_root, -- default is false,for open file in hyper mru. it will change to the root of vcs
-        config = {}               --  config used for theme
-        -- hide = {
-        --     statusline, -- hide statusline default is true
-        --     tabline, -- hide the tabline
-        --     winbar -- hide winbar
-        -- },
-        -- preview = {
-        --     command, -- preview command
-        --     file_path, -- preview file path
-        --     file_height, -- preview file height
-        --     file_width -- preview file width
-        -- }
+    "mg979/vim-visual-multi",
+    branch = "master",
+    event = "VeryLazy",
+    init = function()
+      vim.g.VM_maps = {
+        ["Find Under"] = "<C-d>",
       }
     end,
-    dependencies = { { 'nvim-tree/nvim-web-devicons' } }
   },
-  {
-    'lukas-reineke/indent-blankline.nvim',
-    main = 'ibl',
-    config = function() return require("doty.plugins.indent-blankline") end
-  }
 }
