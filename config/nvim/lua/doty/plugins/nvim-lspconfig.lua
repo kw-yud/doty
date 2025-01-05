@@ -48,6 +48,23 @@ lspconfig.util.on_setup = lspconfig.util.add_hook_after(
 
 masonlspconfig.setup_handlers({
   lsp_zero.default_setup,
+  -- setup Ansible
+  lspconfig.ansiblels.setup({
+    settings = {
+      ansible = {
+        executionEnvironment = {
+          enabled = true,
+        },
+        validation = {
+          enabled = true,
+          lint = {
+            enabled = true,
+          },
+        },
+      },
+    },
+  }),
+
   -- setup Shell scripts
   lspconfig.bashls.setup({
     settings = {
@@ -102,11 +119,24 @@ masonlspconfig.setup_handlers({
     },
   }),
 
+  -- setup Helm
+  lspconfig.helm_ls.setup({
+    settings = {
+      ["helm-ls"] = {
+        yamlls = { path = "yaml-language-server" },
+      },
+    },
+  }),
+
+  -- Setup JavaScript, TypeScript
+  lspconfig.ts_ls.setup({}),
+
   -- Setup JSON
   lspconfig.jsonls.setup({
     capabilities = capabilitiesSnippet,
     settings = {
       json = {
+        schema = require("schemastore").json.schemas(),
         validate = { enable = true },
       },
     },
@@ -146,6 +176,20 @@ masonlspconfig.setup_handlers({
     },
   })),
 
+  -- Setup Python
+  lspconfig.pylsp.setup({
+    settings = {
+      pylsp = {
+        plugins = {
+          pycodsyle = {
+            ignore = { "W391", "E501" },
+            maxLineLength = 120,
+          },
+        },
+      },
+    },
+  }),
+
   -- Setup Rust
   lspconfig.rust_analyzer.setup({
     -- Server-specific settings. See `:help lspconfig-setup`
@@ -181,6 +225,17 @@ masonlspconfig.setup_handlers({
     },
   }),
 
+  -- Setup Terraform
+  lspconfig.terraformls.setup({
+    root_dir = lspconfig.util.root_pattern(
+      "*.tf",
+      "*.terraform",
+      "*.tfvars",
+      ".terraform",
+      ".git"
+    ),
+  }),
+
   -- Setup YAML
   lspconfig.yamlls.setup({
     settings = {
@@ -192,6 +247,20 @@ masonlspconfig.setup_handlers({
           -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
           url = "",
         },
+        schemas = require("schemastore").yaml.schemas({
+          extra = {
+            -- Currently, kubernetes is special-cased in yammls, see the following upstream issues:
+            -- * [#211](https://github.com/redhat-developer/yaml-language-server/issues/211).
+            -- * [#307](https://github.com/redhat-developer/yaml-language-server/issues/307).
+            {
+              description = "My custom JSON schema",
+              fileMatch = "*.k8s.yaml",
+              name = "kubernetes.json",
+              url =
+              "https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json",
+            },
+          },
+        }),
       },
     },
   }),

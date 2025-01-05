@@ -1,18 +1,63 @@
 require("conform").setup({
   formatters_by_ft = {
-    lua = { "stylua" },
+    -- Shell/Bash
+    sh = { "shfmt", "shellcheck" },
+    bash = { "beautysh", "shfmt", "shellcheck", "shellharden" },
+
+    -- Docker
+    dockerfile = { "hadolint" },
+
+    -- Go
     -- Conform will run multiple formatters sequentially
-    go = { "goimports", "gofmt" },
-    -- Use a sub-list to run only the first available formatter
-    javascript = { { "prettierd", "prettier" } },
+    go = { "gofumpt", "gofmt", "goimports", "golines" },
+
+    -- HCL
+    hcl = { "hcl" },
+
+    -- JSON
+    json = { "prettier", "jq" },
+    jsonnet = { "jsonnetfmt" },
+
+    -- Lua
+    lua = { "stylua" },
+
+    -- Markdown
+    markdown = { "prettier", "markdownfmt", "markdownlint" }, -- "doctoc"
+
     -- You can use a function here to determine the formatters dynamically
-    python = function(bufnr)
-      if require("conform").get_formatter_info("ruff_format", bufnr).available then
-        return { "ruff_format" }
-      else
-        return { "isort", "black" }
-      end
-    end,
+    python = { "ruff_format", "isort", "black", stop_after_first = true },
+
+    -- Rust
+    rust = { "rustfmt" },
+
+    -- SQL
+    sql = { "sql_formatter" },
+
+    -- Terraform
+    terraform = { "terraform_fmt", "hcl", stop_after_first = true },
+
+    -- TOML
+    toml = { "taplo" },
+
+    -- YAML, Ansible
+    yaml = { "prettier", "yamlfix", "yamlfmt" },
+
+    -- Use a sub-list to run only the first available formatter
+    -- Conform will run the first available formatter
+    -- TypeScript/JavaScript
+    typescript = {
+      "prettierd",
+      "prettier",
+      "eslint_d",
+      stop_after_first = true,
+    },
+    javascript = {
+      "prettierd",
+      "prettier",
+      "eslint_d",
+      stop_after_first = true,
+    },
+
     -- Use the "*" filetype to run formatters on all filetypes.
     ["*"] = { "codespell", "typos", "trim_whitespace" },
     -- Use the "_" filetype to run formatters on filetypes that don't

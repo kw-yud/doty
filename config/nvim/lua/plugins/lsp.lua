@@ -9,6 +9,15 @@ return {
     end,
   },
   {
+    "kevinhwang91/nvim-ufo", -- Enable folds with nvim-ufo
+    dependencies = {
+      "kevinhwang91/promise-async",
+    },
+    config = function()
+      require("doty.plugins.nvim-ufo")
+    end,
+  },
+  {
     "nvim-lua/lsp-status.nvim",
     config = function()
       require("doty.plugins.lsp-status")
@@ -72,6 +81,40 @@ return {
       require("doty.plugins.nvim-lspconfig")
     end,
   },
+  {
+    "stevearc/conform.nvim",
+    config = function()
+      require("doty.plugins.nvim-lspconfig-conform")
+    end,
+  },
+  {
+    "zapling/mason-conform.nvim",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "stevearc/conform.nvim",
+    },
+    -- init = function()
+    --   -- Conform also provides a formatexpr, same as the LSP client.
+    --   -- If you want the formatexpr, here is the place to set it.
+    --   vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+    -- end,
+    config = function()
+      require("mason-conform").setup({
+        -- List of formatters to ignore during install
+        ignore_install = {
+          -- "prettier",
+          -- "helm_ls",
+          -- "yq",
+        },
+      })
+    end,
+  },
+
+  -- JSON -------------------------------------------------------------
+  -- towolf/vim-helm provides basic syntax highlighting and filetype detection
+  -- ft = "helm" is important to not start yamlls
+  "b0o/SchemaStore.nvim",
+  -- END ---
 
   -- Helm -------------------------------------------------------------
   -- towolf/vim-helm provides basic syntax highlighting and filetype detection
@@ -123,5 +166,15 @@ return {
   --             ensure_installed = {}
   --         }
   --     end
+  -- },
+  -- Linters: { "jose-elias-alvarez/null-ls.nvim" } or { "mfussenegger/nvim-lint" }
+  -- Formatters: { "jose-elias-alvarez/null-ls.nvim" } or { "mhartington/formatter.nvim" }
+  -- {
+  --   "ThePrimeagen/refactoring.nvim",
+  --   event = "VeryLazy",
+  --   dependencies = {
+  --     { "nvim-lua/plenary.nvim" },
+  --     { "nvim-treesitter/nvim-treesitter" }
+  --   },
   -- },
 }
