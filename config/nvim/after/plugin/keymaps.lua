@@ -362,6 +362,33 @@ wk.add({
 -- vim-visual-multi -------------------------------------------------
 -- wk.add({{ "<C-n>", "<Plug>(VM-Select-Operator)", desc = "Select Operator" }})
 
+-- Conform ----------------------------------------------------------
+wk.add({
+  -- Leave visual mode after range format
+  -- If you call `conform.format` when in visual mode,
+  -- conform will perform a range format on the selected region.
+  -- If you want it to leave visual mode afterwards (similar to the default `gw` or `gq` behavior), use this mapping:
+  {
+    "<M-F>",
+    function()
+      require("conform").format({ async = true }, function(err)
+        if not err then
+          local mode = vim.api.nvim_get_mode().mode
+          if vim.startswith(string.lower(mode), "v") then
+            vim.api.nvim_feedkeys(
+              vim.api.nvim_replace_termcodes("<Esc>", true, false, true),
+              "n",
+              true
+            )
+          end
+        end
+      end)
+    end,
+    desc = "Format code",
+    mode = { "v" },
+  },
+})
+
 -- Trouble ----------------------------------------------------------
 wk.add({
   { "<leader>x", group = "Diagnostics" },
@@ -471,6 +498,95 @@ wk.add({
     desc = "Show auto-complete suggestion",
     mode = { "i" },
   },
+
+  ---
+  -- Folding
+  ---
+  {
+    "zR",
+    function()
+      require("ufo").openAllFolds()
+    end,
+    desc = "Fold: Open all",
+  },
+  {
+    "zM",
+    function()
+      require("ufo").closeAllFolds()
+    end,
+    desc = "Fold: Close all",
+  },
+  {
+    "zr",
+    function()
+      require("ufo").openFoldsExceptKinds()
+    end,
+    desc = "Fold: Open except kinds",
+  },
+  {
+    "zm",
+    function()
+      require("ufo").closeFoldsWith()
+    end,
+    desc = "Fold: Close with",
+  },
+  {
+    "zK",
+    function()
+      local winid = require("ufo").peekFoldedLinesUnderCursor()
+      if not winid then
+        vim.lsp.buf.hover()
+      end
+    end,
+    desc = "Fold: Hover Definitions",
+  },
+  {
+    "z[",
+    function()
+      local ufo = require("ufo")
+      ufo.goPreviousClosedFold()
+      ufo.peekFoldedLinesUnderCursor()
+    end,
+    desc = "Fold: Go previous closed",
+  },
+  {
+    "z]",
+    function()
+      local ufo = require("ufo")
+      ufo.goNextClosedFold()
+      ufo.peekFoldedLinesUnderCursor()
+    end,
+    desc = "Fold: Go next closed",
+  },
+
+  -- TODO: Default Presets ???
+  -- { "z<CR>", desc = "Top this line" },
+  -- { "z=", desc = "Spelling suggestions" },
+  -- { "zA", desc = "Toggle all folds under cursor" },
+  -- { "zC", desc = "Close all folds under cursor" },
+  -- { "zD", desc = "Delete all folds under cursor" },
+  -- { "zE", desc = "Delete all folds in file" },
+  -- { "zH", desc = "Half screen to the left" },
+  -- { "zL", desc = "Half screen to the right" },
+  -- { "zM", desc = "Close all folds" },
+  -- { "zO", desc = "Open all folds under cursor" },
+  -- { "zR", desc = "Open all folds" },
+  -- { "za", desc = "Toggle fold under cursor" },
+  -- { "zb", desc = "Bottom this line" },
+  -- { "zc", desc = "Close fold under cursor" },
+  -- { "zd", desc = "Delete fold under cursor" },
+  -- { "ze", desc = "Right this line" },
+  -- { "zg", desc = "Add word to spell list" },
+  -- { "zi", desc = "Toggle folding" },
+  -- { "zm", desc = "Fold more" },
+  -- { "zo", desc = "Open fold under cursor" },
+  -- { "zr", desc = "Fold less" },
+  -- { "zs", desc = "Left this line" },
+  -- { "zt", desc = "Top this line" },
+  -- { "zv", desc = "Show cursor line" },
+  -- { "zw", desc = "Mark word as bad/misspelling" },
+  -- { "zx", desc = "Update folds" },
+  -- { "zz", desc = "Center this line" },
 })
 
 -- ZenMode ----------------------------------------------------------
