@@ -43,6 +43,9 @@ return {
       "rcarriga/nvim-notify",
       "nvim-treesitter/nvim-treesitter",
     },
+    config = function()
+      return require("doty.plugins.noice")
+    end,
   },
   {
     "stevearc/dressing.nvim",
@@ -128,13 +131,15 @@ return {
       return require("doty.plugins.indent-blankline")
     end,
   },
-  -- {
-  -- Remove all background colors to make nvim transparent
-  --    "xiyaowong/nvim-transparent",
-  --    name = "transparent",
-  --    event = 'VeryLazy',
-  --    config = function() require("doty.plugins.transparent") end
-  -- },
+  {
+    -- Remove all background colors to make nvim transparent
+    "xiyaowong/nvim-transparent",
+    main = "transparent",
+    event = "VeryLazy",
+    config = function()
+      require("doty.plugins.nvim-transparent")
+    end,
+  },
   {
     "folke/twilight.nvim",
     dependencies = {
@@ -161,5 +166,13 @@ return {
         ["Find Under"] = "<C-d>",
       }
     end,
+  },
+  {
+    "2kabhishek/nerdy.nvim",
+    dependencies = {
+      "stevearc/dressing.nvim",
+      "nvim-telescope/telescope.nvim",
+    },
+    cmd = "Nerdy",
   },
 }
