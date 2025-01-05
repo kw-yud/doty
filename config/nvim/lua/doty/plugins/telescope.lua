@@ -4,6 +4,63 @@ local icons = require("nvim-nonicons")
 local telescope = require("telescope")
 
 telescope.setup({
+  extensions = {
+    heading = {
+      treesitter = true,
+      picker_opts = {
+        layout_config = { width = 0.8, preview_width = 0.5 },
+        layout_strategy = "horizontal",
+      },
+    },
+    ["ui-select"] = {
+      require("telescope.themes").get_dropdown({}),
+    },
+    file_browser = {
+      theme = "ivy",
+      hijack_netrw = false,
+      hidden = true,
+      mappings = {
+        i = {
+          ["<c-n>"] = telescope.extensions.file_browser.actions.create,
+          ["<c-r>"] = telescope.extensions.file_browser.actions.rename,
+          ["<c-h>"] = telescope.extensions.file_browser.actions.toggle_hidden,
+          ["<c-x>"] = telescope.extensions.file_browser.actions.remove,
+          ["<c-p>"] = telescope.extensions.file_browser.actions.move,
+          ["<c-y>"] = telescope.extensions.file_browser.actions.copy,
+          ["<c-a>"] = telescope.extensions.file_browser.actions.select_all,
+
+          ["<C-h>"] = function()
+            require("which-key").show({ global = false })
+          end,
+        },
+      },
+    },
+  },
+  pickers = {
+    find_files = {
+      hidden = false,
+    },
+    oldfiles = {
+      cwd_only = true,
+    },
+    buffers = {
+      ignore_current_buffer = true,
+      sort_lastused = true,
+    },
+    live_grep = {
+      -- sorter = telescope.extensions.fzf.native_fzf_sorter(fzf_opts),
+      only_sort_text = true, -- grep for content and not file name/path
+      mappings = {
+        i = {
+          ["<c-f>"] = actions.to_fuzzy_refine,
+
+          ["<C-h>"] = function()
+            require("which-key").show({ global = false })
+          end,
+        },
+      },
+    },
+  },
   defaults = {
     selection_strategy = "follow",
     prompt_prefix = "  " .. icons.get("telescope") .. "  ",
@@ -170,5 +227,11 @@ telescope.setup({
 })
 
 telescope.load_extension("dap")
+telescope.load_extension("file_browser")
+telescope.load_extension("heading")
 telescope.load_extension("lazygit")
+telescope.load_extension("make")
+telescope.load_extension("noice")
 telescope.load_extension("notify")
+telescope.load_extension("projects")
+telescope.load_extension("ui-select")
