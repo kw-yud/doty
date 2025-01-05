@@ -70,4 +70,9 @@ return {
     lazy = true,
     dependencies = { "nvim-tree/nvim-web-devicons" },
   },
+  {
+    "echasnovski/mini.nvim",
+    version = "*",
+    lazy = true,
+  },
 }
