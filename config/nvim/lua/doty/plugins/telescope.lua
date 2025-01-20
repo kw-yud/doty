@@ -230,8 +230,19 @@ telescope.load_extension("dap")
 telescope.load_extension("file_browser")
 telescope.load_extension("heading")
 telescope.load_extension("lazygit")
-telescope.load_extension("make")
 telescope.load_extension("noice")
 telescope.load_extension("notify")
 telescope.load_extension("projects")
 telescope.load_extension("ui-select")
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup(
+    "DotyTelescopeMakefile",
+    { clear = true }
+  ),
+  pattern = { "makefile" },
+  desc = "Enable telescope for makefile",
+  callback = function()
+    telescope.load_extension("make")
+  end,
+})
