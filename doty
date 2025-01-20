@@ -5,10 +5,12 @@
 
 [[ -z "${DOTFILES_LOCAL_DIRECTORY}" ]] && export DOTFILES_LOCAL_DIRECTORY="${DOTY_DIRECTORY}.local"
 [[ -z "${DOTY_DEVELOPMENT_DIRECTORY}" ]] && export DOTY_DEVELOPMENT_DIRECTORY="${HOME}/.local/share"
+[[ -z "${DOTY_DEVELOPMENT_CONFIG_DIRECTORY}" ]] && export DOTY_DEVELOPMENT_CONFIG_DIRECTORY="${HOME}/.local/config"
 [[ -z "${DOTY_DEVELOPMENT_CACHE_DIRECTORY}" ]] && export DOTY_DEVELOPMENT_CACHE_DIRECTORY="${HOME}/.local/cache"
 [[ -z "${DOTY_DEVELOPMENT_SDK_DIRECTORY}" ]] && export DOTY_DEVELOPMENT_SDK_DIRECTORY="${DOTY_DEVELOPMENT_DIRECTORY}/sdks"
 
 [[ -d "${DOTY_DEVELOPMENT_DIRECTORY}" ]] || mkdir -p "${DOTY_DEVELOPMENT_DIRECTORY}"
+[[ -d "${DOTY_DEVELOPMENT_CONFIG_DIRECTORY}" ]] || mkdir -p "${DOTY_DEVELOPMENT_CONFIG_DIRECTORY}"
 [[ -d "${DOTY_DEVELOPMENT_CACHE_DIRECTORY}" ]] || mkdir -p "${DOTY_DEVELOPMENT_CACHE_DIRECTORY}"
 [[ -d "${DOTY_DEVELOPMENT_SDK_DIRECTORY}" ]] || mkdir -p "${DOTY_DEVELOPMENT_SDK_DIRECTORY}"
 
@@ -60,6 +62,7 @@ if [[ -z $plugins ]]; then
         git-extras
         # git-prompt
         gitignore
+        helm
         history
         jsontools
         last-working-dir
