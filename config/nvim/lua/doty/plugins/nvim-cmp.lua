@@ -278,21 +278,21 @@ cmp.setup.filetype({ "gitcommit", "markdown" }, {
 -- })
 
 -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline(":", {
-  mapping = cmp.mapping.preset.cmdline(),
-  sources = cmp.config.sources({
-    { name = "path" },
-  }, {
-    {
-      name = "cmdline",
-      max_item_count = 20,
-      keyword_length = 4,
-      option = {
-        ignore_cmds = { "Man", "!" },
-      },
-    },
-  }),
-})
+-- cmp.setup.cmdline(":", {
+--   mapping = cmp.mapping.preset.cmdline(),
+--   sources = cmp.config.sources({
+--     { name = "path" },
+--   }, {
+--     {
+--       name = "cmdline",
+--       max_item_count = 20,
+--       keyword_length = 4,
+--       option = {
+--         ignore_cmds = { "Man", "!" },
+--       },
+--     },
+--   }),
+-- })
 
 -- Setup buffer configuration (nvim-lua source only enables in Lua filetype).
 -- ON YOUTUBE I SAID: This only _adds_ sources for a filetype, not removes the global ones.
