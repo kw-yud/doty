@@ -8,7 +8,8 @@ function __init_gvm() {
     # export GVM_OVERLAY_PREFIX="${GOPATH}/overlay"
     export GOBIN="${GOPATH}/bin"
     export GOCACHE="${DOTY_DEVELOPMENT_CACHE_DIRECTORY}/go-build/${_goversion}"
-    export GOTOOLDIR="${GOROOT}/pkg/tool/darwin_arm64"
+    # TODO: Add support system version
+    # export GOTOOLDIR="${GOROOT}/pkg/tool/darwin_arm64"
     # export PATH="${GOBIN}:${GVM_OVERLAY_PREFIX}:${PATH}"
     # export LD_LIBRARY_PATH="${GVM_OVERLAY_PREFIX}:${LD_LIBRARY_PATH}"
     # export PKG_CONFIG_PATH="${GVM_OVERLAY_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}"
