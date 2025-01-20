@@ -135,7 +135,6 @@ return {
     -- Remove all background colors to make nvim transparent
     "xiyaowong/nvim-transparent",
     main = "transparent",
-    event = "VeryLazy",
     config = function()
       require("doty.plugins.nvim-transparent")
     end,
