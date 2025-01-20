@@ -142,6 +142,26 @@ masonlspconfig.setup_handlers({
     },
   }),
 
+  lspconfig.jsonnet_ls.setup({
+    settings = {
+      formatting = {
+        -- default values
+        Indent = 2,
+        MaxBlankLines = 2,
+        StringStyle = "single",
+        CommentStyle = "slash",
+        PrettyFieldNames = true,
+        PadArrays = false,
+        PadObjects = true,
+        SortImports = true,
+        UseImplicitPlus = true,
+        StripEverything = false,
+        StripComments = false,
+        StripAllButComments = false,
+      },
+    },
+  }),
+
   -- Setup Lua
   lspconfig.lua_ls.setup(lsp_zero.nvim_lua_ls({
     -- on_init = function(client)
