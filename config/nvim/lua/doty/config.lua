@@ -107,15 +107,21 @@ M.icons = {
   },
 
   vim_mode = {
-    NORMAL = "󰒂",
-    INSERT = "󱚌", -- "󱅄",
-    VISUAL = "",
-    REPLACE = "",
-    COMMAND = "",
-    ["V-LINE"] = "󰕢", -- "󱂔"
-    -- s	Select
-    -- o	Operator-pending
-    -- t	Terminal-Job
+    ["NORMAL"] = "󰒂",
+    ["VISUAL"] = "",
+    ["V-BLOCK"] = "",
+    ["V-LINE"] = "󰕢", -- "󱂔",
+    ["SELECT"] = "󰒅",
+    ["S-LINE"] = "",
+    ["S-BLOCK"] = "󰩬",
+    ["REPLACE"] = "",
+    ["V-REPLACE"] = "󰛔",
+    ["INSERT"] = "󱚌", -- "󱅄",
+    ["COMMAND"] = "",
+    ["EX"] = "",
+    ["MORE"] = "󰴤",
+    ["CONFIRM"] = "󰔘",
+    ["TERMINAL"] = "",
   },
 
   lualine = {

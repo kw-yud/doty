@@ -166,7 +166,8 @@ opt.shortmess:append("c") -- Don't show the dumb matching stuff.
 
 -- Disable context_commentstring nvim-treesitter module to speed up loading",
 -- as nvim-ts-context-commentstring is alreadey initialized separately.
-vim.g.skip_ts_context_commentstring_module = true
+g.skip_ts_context_commentstring_module = true
+g.health = { style = "float" } -- display :checkhealth in a floating window instead of the default behavior
 
 -- Disable builtin plugins
 local disabled_built_ins = {
