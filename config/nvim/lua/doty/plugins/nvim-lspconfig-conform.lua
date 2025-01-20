@@ -12,7 +12,8 @@ require("conform").setup({
     go = { "gofumpt", "gofmt", "goimports", "golines" },
 
     -- HCL
-    hcl = { "hcl" },
+    -- hcl = { "hcl" },
+    hcl = { "packer_fmt" },
 
     -- JSON
     json = { "prettier", "jq" },
@@ -34,7 +35,9 @@ require("conform").setup({
     sql = { "sql_formatter" },
 
     -- Terraform
-    terraform = { "terraform_fmt", "hcl", stop_after_first = true },
+    terraform = { "terraform_fmt" },
+    tf = { "terraform_fmt" },
+    ["terraform-vars"] = { "terraform_fmt" },
 
     -- TOML
     toml = { "taplo" },
