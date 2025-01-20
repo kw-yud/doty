@@ -2,9 +2,10 @@
 
 alias kgdcm='_f(){ kgd ${@} -o json | jq ".spec.template.spec.containers[]?.envFrom?"}; _f'
 alias ktp='k top pod'
+alias ktn='k top node'
 alias kge='k get events'
-alias "kgp-unsuccess"='kubectl get pods --field-selector status.phase!=Running,status.phase!=Succeeded'
+alias "kgp-unsuccessful"='kubectl get pods --field-selector status.phase!=Running,status.phase!=Succeeded'
 alias "kgp-completed"='kubectl get pods --field-selector status.phase!=Completed'
-alias "kgp-unsuccess-name"='kgp-unsuccess -o custom-columns=":metadata.name"'
+alias "kgp-unsuccessful-name"='kgp-unsuccessful -o custom-columns=":metadata.name"'
 #alias "k-busybox"='_f(){ kubectl run -i --tty --rm busybox-debug --image=busybox --restart=Never ${@} -- sh}: _f'
 alias "k-busybox"='f(){ kubectl run -i --tty --rm busybox-debug --image=busybox --restart=Never "$@" -- sh; }; f'
