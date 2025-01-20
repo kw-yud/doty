@@ -168,6 +168,27 @@ return {
   --     end
   -- },
   -- Linters: { "jose-elias-alvarez/null-ls.nvim" } or { "mfussenegger/nvim-lint" }
+  {
+    "nvimtools/none-ls.nvim",
+  },
+  {
+    "jay-babu/mason-null-ls.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "williamboman/mason.nvim",
+      "nvimtools/none-ls.nvim",
+    },
+    config = function()
+      require("doty.plugins.mason-null-ls")
+    end,
+  },
+  -- {
+  --   "mfussenegger/nvim-lint",
+  --   main = "lint",
+  --   config = function()
+  --     require("doty.plugins.nvim-lint")
+  --   end,
+  -- },
   -- Formatters: { "jose-elias-alvarez/null-ls.nvim" } or { "mhartington/formatter.nvim" }
   -- {
   --   "ThePrimeagen/refactoring.nvim",

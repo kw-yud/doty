@@ -35,6 +35,14 @@ local conditions = {
 --   hl_group = "lualine_c_normal",
 -- })
 
+local lint_progress = function()
+  local linters = require("lint").get_running()
+  if #linters == 0 then
+      return "󰦕"
+  end
+  return "󱉶 " .. table.concat(linters, ", ")
+end
+
 return {
   options = {
     icons_enabled = true,
@@ -178,6 +186,7 @@ return {
       },
     },
     lualine_y = {
+      lint_progress,
       {
         "encoding",
         -- Show '[BOM]' when the file has a byte-order mark
