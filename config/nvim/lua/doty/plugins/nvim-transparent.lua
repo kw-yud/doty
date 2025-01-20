@@ -40,7 +40,7 @@ transparent.setup({
   -- on_clear = function() end,
 })
 
-transparent.clear_prefix("lualine")
+-- transparent.clear_prefix("lualine")
 transparent.toggle(true)
 
 -- Add additional highlight groups by explicitly assigning the variable `g:transparent_groups`.
