@@ -182,7 +182,7 @@ function tree() {
 }
 
 function bcrypt() {
-  htpasswd -bnBC 10 "" "$1" | tr -d ':'
+  htpasswd -bnBC 10 "" "$1" | tr -d ':' | head -n 1
 }
 
 function myip() {
