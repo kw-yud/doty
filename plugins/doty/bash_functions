@@ -2,18 +2,18 @@
 
 function print-color() {
   for i in {0..255}; do
-    print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'};
+    print -On "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'};
   done
 }
 
 # Create a new directory and enter it
 function mkd() {
-	mkdir -p "$@" && cd "$_"
+	mkdir -p "$@" && cd "$_" || exit
 }
 
 # Change working directory to the top-most Finder window location
 function cdf() { # short for `cdfinder`
-	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
+	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')" || exit
 }
 
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
@@ -110,7 +110,7 @@ function gz() {
 	local gzipsize=$(gzip -c "$1" | wc -c)
 	local ratio=$(echo "$gzipsize * 100 / $origsize" | bc -l)
 	printf "original: %d bytes\n" "$origsize"
-	printf "gziped: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio"
+	printf "gzipped: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio"
 }
 
 # Run `dig` and display the most useful info
@@ -173,11 +173,11 @@ function o() {
 	fi
 }
 
-# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
+# `tree` is a shorthand for `tree` with hidden files and color enabled, ignoring
 # the `.git` directory, listing directories first. The output gets piped into
 # `less` with options to preserve color and line numbers, unless the output is
 # small enough for one screen.
-function tre() {
+function tree() {
 	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX
 }
 
@@ -193,9 +193,9 @@ function myip() {
 
   response=$(curl -s ipinfo.io/json)
 
-  echo "IP:           $(echo $response | jq -r '.ip')"
-  echo "Location:     $(echo $response | jq '{loc: (.city + ", " +.region)}' | jq -r '.loc')"
-  echo "Organization: $(echo $response | jq -r '.org')"
+  echo "IP:           $(echo "$response" | jq -r '.ip')"
+  echo "Location:     $(echo "$response" | jq '{loc: (.city + ", " +.region)}' | jq -r '.loc')"
+  echo "Organization: $(echo "$response" | jq -r '.org')"
 }
 
 # Get OS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
