@@ -3,6 +3,7 @@
 alias kgdcm='_f(){ kgd ${@} -o json | jq ".spec.template.spec.containers[]?.envFrom?"}; _f'
 alias ktp='k top pod'
 alias ktn='k top node'
+alias kgn='k get node'
 alias kge='k get events'
 alias "kgp-unsuccessful"='kubectl get pods --field-selector status.phase!=Running,status.phase!=Succeeded'
 alias "kgp-completed"='kubectl get pods --field-selector status.phase!=Completed'
