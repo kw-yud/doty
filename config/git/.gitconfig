@@ -102,6 +102,9 @@
     # Make `git push` push relevant annotated tags when pushing branches out.
     # followTags = true
 
+[submodule]
+	recurse = true
+
 # URL shorthands
 [alias]
     # https://git.wiki.kernel.org/articles/a/l/i/Aliases.html
@@ -240,7 +243,7 @@
     who = shortlog --numbered --summary --email --no-merges --since '3 months'
 
     # List contributors with number of commits.
-    contributors = shortlog --summary --numbered
+    contributors = shortlog -e --summary --numbered
 
     # Show the user email for the current repository.
     whoami = config user.email
