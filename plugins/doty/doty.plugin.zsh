@@ -5,12 +5,12 @@
 0="${${(M)0:#/*}:-$PWD/$0}"
 
 # Load the shell dotfiles, and then some:
-[[ -f "${0:h}/path" ]] && source "${0:h}/path"
+# [[ -f "${0:h}/path" ]] && source "${0:h}/path"
 # [[ -f "${0:h}/bash_prompt" ]] && source "${0:h}/bash_prompt"
-[[ -f "${0:h}/bash_exports" ]] && source "${0:h}/bash_exports"
-[[ -f "${0:h}/aliases" ]] && source "${0:h}/aliases"
-[[ -f "${0:h}/bash_functions" ]] && source "${0:h}/bash_functions"
-[[ -f "${0:h}/extra" ]] && source "${0:h}/extra"
+# [[ -f "${0:h}/bash_exports" ]] && source "${0:h}/bash_exports"
+# [[ -f "${0:h}/aliases" ]] && source "${0:h}/aliases"
+# [[ -f "${0:h}/bash_functions" ]] && source "${0:h}/bash_functions"
+# [[ -f "${0:h}/extra" ]] && source "${0:h}/extra"
 
 # Append to the Bash history file, rather than overwriting it
 # shopt -s histappend;

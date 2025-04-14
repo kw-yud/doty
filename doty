@@ -22,20 +22,20 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # Load the local shell dotfiles, and then some:
-[[ -f "${HOME}/.zsh_path" ]] && source "${HOME}/.zsh_path"
-[[ -f "${HOME}/.zsh_prompt" ]] && source "${HOME}/.zsh_prompt"
-[[ -f "${HOME}/.zsh_exports" ]] && source "${HOME}/.zsh_exports"
-[[ -f "${HOME}/.zsh_aliases" ]] && source "${HOME}/.zsh_aliases"
-[[ -f "${HOME}/.zsh_functions" ]] && source "${HOME}/.zsh_functions"
-[[ -f "${HOME}/.zsh_extra" ]] && source "${HOME}/.zsh_extra"
+# * ~/.zsh_path can be used to extend `$PATH`.
+# * ~/.zsh_extra can be used for other settings you don’t want to commit.
+for file in ${HOME}/.zsh_{path,prompt,exports,aliases,functions,extra}; do
+	[ -r "$file" ] && [ -f "$file" ] && source "$file";
+done;
+unset file;
 
 # Load the local shell dotfiles, and then some:
-[[ -f "${DOTFILES_LOCAL_DIRECTORY}/path" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/path"
-[[ -f "${DOTFILES_LOCAL_DIRECTORY}/bash_prompt" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/bash_prompt"
-[[ -f "${DOTFILES_LOCAL_DIRECTORY}/bash_exports" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/bash_exports"
-[[ -f "${DOTFILES_LOCAL_DIRECTORY}/aliases" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/aliases"
-[[ -f "${DOTFILES_LOCAL_DIRECTORY}/bash_functions" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/bash_functions"
-[[ -f "${DOTFILES_LOCAL_DIRECTORY}/extra" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/extra"
+# [[ -f "${DOTFILES_LOCAL_DIRECTORY}/path" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/path"
+# [[ -f "${DOTFILES_LOCAL_DIRECTORY}/bash_prompt" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/bash_prompt"
+# [[ -f "${DOTFILES_LOCAL_DIRECTORY}/bash_exports" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/bash_exports"
+# [[ -f "${DOTFILES_LOCAL_DIRECTORY}/aliases" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/aliases"
+# [[ -f "${DOTFILES_LOCAL_DIRECTORY}/bash_functions" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/bash_functions"
+# [[ -f "${DOTFILES_LOCAL_DIRECTORY}/extra" ]] && source "${DOTFILES_LOCAL_DIRECTORY}/extra"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
