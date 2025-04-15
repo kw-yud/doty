@@ -8,6 +8,10 @@ if [[ $PMSPEC != *b* ]] {
   PATH="${0:h}/bin:${PATH}"
 }
 
-eval "$(mise activate zsh)"
-eval "$( mise activate zsh --shims)"
+if (( ! $+commands[mise] )); then
+  return
+fi
 
+source "$ZSH/plugins/helm/helm.plugin.zsh"
+
+eval "$(mise activate zsh --shims)"

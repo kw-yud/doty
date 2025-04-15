@@ -44,7 +44,6 @@ unset file;
 # Add wisely, as too many plugins slow down shell startup.
 if [[ -z $plugins ]]; then
     plugins=(
-        adb
         aliases
         brew
         colored-man-pages
@@ -56,52 +55,60 @@ if [[ -z $plugins ]]; then
         dotenv
         emoji
         emotty
+        encode64
         extract
-        fd
-        git
+        fzf
+        gcloud
+        genpass
         git-extras
         # git-prompt
         gitignore
-        helm
+        gpg-agent
         history
+        isodate
+        iterm2
         jsontools
+        k9s
         last-working-dir
-        limactl
-        # mise
-        nmap
-        nodenv
         npm
-        nvm
-        pfctl
         # pop
         pre-commit
-        # pyenv
+        profiles
         # pylint
-        ripgrep
-        sdk
+        ssh
+        ssh-agent
         thefuck
+        terraform
         # themes
+        universalarchive
         urltools
         vscode
+        yarn
         z
+        zbell
+        # zsh-interactive-cd
+        # zsh-navigation-tools
 
         ### Local
-        android
-        encode64
-        fzf
+        # android
+        git
         github
         golang
+        helm
         kubectl
         kubectx
+        limactl
         macos
-        minikube
+        # minikube
+        mise
+        nmap
         nodejs
+        pfctl
         podman
         python
         rust
         tmux
 
-        gcloud
         doty
         zsh-autosuggestions
         zsh-syntax-highlighting
@@ -130,6 +137,9 @@ export ZSH_CUSTOM="${DOTY_DIRECTORY}"
 export ZSHZ_DATA="${DOTY_DEVELOPMENT_CACHE_DIRECTORY}/z/.z"
 
 export ZSH_DOTENV_FILE=".envrc"
+
+# Colorize style that use pygments
+export ZSH_COLORIZE_STYLE="${ZSH_COLORIZE_STYLE:-"colorful"}"
 
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#777777,bg=#0f3000"
 export ZSH_AUTOSUGGEST_STRATEGY="match_prev_cmd"

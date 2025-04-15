@@ -10,6 +10,8 @@
 # systems without the proper terminfo
 : ${ZSH_TMUX_FIXTERM_WITH_256COLOR:=screen-256color}
 
+source "$ZSH/plugins/tmux/tmux.plugin.zsh"
+
 # Determine if the terminal supports 256 colors
 if [[ $terminfo[colors] == 256 ]]; then
   export DOTY_TMUX_TERM=$ZSH_TMUX_FIXTERM_WITH_256COLOR

@@ -16,6 +16,28 @@ function cdf() { # short for `cdfinder`
 	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')" || exit
 }
 
+# directory LS
+function dls() {
+  print -l *(/)
+}
+function psgrep() {
+  ps aux | grep "${1:-.}" | grep -v grep
+}
+# Kills any process that matches a regexp passed to it
+function killit() {
+  ps aux | grep -v "grep" | grep "$@" | awk '{print $2}' | xargs sudo kill
+}
+
+# Delete 0 byte file
+function d0() {
+  find "${1:-.}" -type f -size 0 -exec rm -rf {} \;
+}
+
+# Clear zombie processes
+function clrz() {
+  ps -eal | awk '{ if ($2 == "Z") {print $4}}' | kill -9
+}
+
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
 	local tmpFile="${@%/}.tar"

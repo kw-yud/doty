@@ -5,15 +5,13 @@
 0="${${(M)0:#/*}:-$PWD/$0}"
 
 # Load the shell dotfiles, and then some:
-# [[ -f "${0:h}/path" ]] && source "${0:h}/path"
-# [[ -f "${0:h}/bash_prompt" ]] && source "${0:h}/bash_prompt"
-# [[ -f "${0:h}/bash_exports" ]] && source "${0:h}/bash_exports"
-# [[ -f "${0:h}/aliases" ]] && source "${0:h}/aliases"
-# [[ -f "${0:h}/bash_functions" ]] && source "${0:h}/bash_functions"
-# [[ -f "${0:h}/extra" ]] && source "${0:h}/extra"
+for file in ${0:h}/{path,bash_prompt,bash_exports,aliases,bash_functions,extra}; do
+	[[ -r "$file" ]] && [[ -f "$file" ]] && source "$file";
+done;
+unset file;
 
 # Case-insensitive globbing (used in pathname expansion)
-shopt -s nocaseglob;
+# shopt -s nocaseglob;
 
 # Append to the Bash history file, rather than overwriting it
 # shopt -s histappend;
@@ -40,6 +38,3 @@ if which brew &> /dev/null && [ -r "$(brew --prefix)/etc/profile.d/bash_completi
 elif [ -f /etc/bash_completion ]; then
 	source /etc/bash_completion;
 fi;
-
-# Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
-[ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" $HOME/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh;
