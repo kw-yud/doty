@@ -57,7 +57,6 @@ if [[ -z $plugins ]]; then
         emotty
         encode64
         extract
-        fzf
         gcloud
         genpass
         git-extras
@@ -91,6 +90,7 @@ if [[ -z $plugins ]]; then
 
         ### Local
         # android
+        fzf
         git
         github
         golang
