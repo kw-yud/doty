@@ -1,0 +1,197 @@
+#!/usr/bin/env zsh
+
+########################################################################################################################
+# Shell options
+########################################################################################################################
+
+# Organized to match the Z Shell Manual's "Options" chapter
+# https://zsh.sourceforge.io/Doc/Release/Options.html
+#
+# TIPS:
+#   1) You can list the existing shell options with the `setopt` command.
+#   2) You can get a list of all default zsh options with the `emulate -lLR zsh` command.
+#   3) You can revert the options for the current shell to the default settings with the `emulate -LR zsh` command.
+
+# This only sets options that exist
+__setopt_if_exists() {
+  if [[ "${options[$1]+1}" ]]; then
+    setopt "$1"
+  fi
+}
+
+#
+# Expansion and Globbing
+# See also: https://zsh.sourceforge.io/Doc/Release/Expansion.html#Brace-Expansion
+#
+# Case-insensitive globbing (used in pathname expansion; to mimic macOS file system behavior)
+__setopt_if_exists no_case_glob
+# Enable extended globbing via additional pattern matching capabilities
+# More information: https://wiki.zshell.dev/community/zsh_guide/roadmap/expansion
+__setopt_if_exists extended_glob
+
+# Autocorrect typos in path names when using `cd`
+# shopt -s cdspell;
+
+# Check the window size after each command and, if necessary, update the values
+# of LINES and COLUMNS.
+# shopt -s checkwinsize
+
+# Enable some Bash 4 features when possible:
+# * `autocd`, e.g. `**/qux` will enter `./foo/bar/baz/qux`
+# shopt -s autocd 2> /dev/null;
+# * Recursive globbing, e.g. `echo **/*.txt`
+
+#
+# History
+#
+# Remove older duplicate commands from the history list, keep newest
+__setopt_if_exists hist_ignore_all_dups
+# Do not find duplicate commands when searching
+__setopt_if_exists hist_find_no_dups
+# Remove superfluous blanks from history items
+__setopt_if_exists hist_reduce_blanks
+# Don't store commands prefixed with a space
+__setopt_if_exists hist_ignore_space
+# When using history expansion (!!, !$, etc.), present for user confirmation/editing
+# __setopt_if_exists hist_verify
+# Append to the history file, rather than overwriting it
+# __setopt_if_exists append_history;
+# Do not append history entries to the history file
+# NOTE: This has to be turned off for shared history to work.
+# __setopt_if_exists no_inc_append_history
+# Disable writing out the history entry to the file after the command is finished.
+# NOTE: This has to be turned off for shared history to work.
+# __setopt_if_exists no_inc_append_history_time
+# Share history between different instances of the shell
+__setopt_if_exists share_history
+
+#
+# "Input/Output"
+#
+# Prevent existing files from being overwritten by redirection operations (`>`).
+# You can still override this with `>|`.
+# __setopt_if_exists no_clobber
+# Autocorrect commands with typos and ask to run the correct command instead
+__setopt_if_exists correct # commands
+# Allow comments in interactive shells (like Bash does)
+__setopt_if_exists interactive_comments
+
+unset __setopt_if_exists
+
+#
+# Completion
+# NOTE: Oh My Zsh will auto-reload all files that prefixed with `_*`
+# See also: https://zsh.sourceforge.io/Guide/zshguide06.html
+#
+# Base options
+#
+# Shift the cursor to the end of the word after tab-completion
+__setopt_if_exists always_to_end
+# Automatically list choices on ambiguous completion
+__setopt_if_exists auto_list
+# Show completion menu on successive tab press
+__setopt_if_exists auto_menu
+# Allow completion from both ends of a word and within a word
+__setopt_if_exists complete_in_word
+
+########################################################################################################################
+# Shell styles
+########################################################################################################################
+# Zstyle pattern
+# :completion:<function>:<completer>:<command>:<argument>:<tag>
+
+# Have the menu highlight as we cycle through options with arrow keys
+zstyle ':completion:*' menu select
+# Group results by category (named after the tags)
+zstyle ':completion:*' group-name ''
+# Enable approximate matches for completion
+zstyle ':completion:*' completer _expand _extensions _complete _ignored _approximate
+
+# Pasting with tabs doesn't perform completion
+zstyle ':completion:*' insert-tab pending
+
+# Partial completion suggestions
+zstyle ':completion:*' list-suffixes
+zstyle ':completion:*' expand prefix suffix
+
+# Enabling cache for the completions
+# The directory in cache-path must be created manually.
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path "${HOME}/.zcompcache"
+# Complete the alias when _expand_alias is used as a function
+zstyle ':completion:*' complete true
+zstyle ':completion:*' file-sort modification
+zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
+zstyle ':completion:*:*:*:*:descriptions' format '%F{blue}-- %D %d --%f'
+zstyle ':completion:*:*:*:*:messages' format ' %F{purple} -- %d --%f'
+zstyle ':completion:*:*:*:*:warnings' format ' %F{red}-- no matches found --%f'
+zstyle ':completion:*:default' list-prompt '%S%M matches%s'
+# Colors for files and directory
+zstyle ':completion:*:*:*:*:default' list-colors ${(s.:.)LS_COLORS}
+# Preferred order of autocomplete groups
+zstyle ':completion:*:*:-command-:*:*' group-order aliases builtins functions commands
+# Only display some tags for the command cd
+zstyle ':completion:*:*:cd:*' tag-order local-directories directory-stack path-directories
+zstyle ':completion:*' keep-prefix true
+
+
+########################################################################################################################
+# Key bindings
+#
+# http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html
+# http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Zle-Builtins
+# http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Standard-Widgets
+#
+# TIPS:
+#   1) Use `read -k` to get a key sequence.
+#   2) Use `bindkey` to output all the key bindings for the global keymap.
+########################################################################################################################
+typeset -gA keys=(
+  Up              '^[[A'
+  Down            '^[[B'
+  Home            '^[[H'
+  End             '^[[F'
+  Delete          '^[[3~'
+  Escape          '^['
+
+  Ctrl+Delete     '^[[3;5~'
+  Ctrl+K          '^K'
+)
+
+# Delete key doesn’t work as expected and inputs ~ instead.
+# This is a fix to the problem: https://blog.pilif.me/2004/10/21/delete-key-in-zsh/
+bindkey -- "${keys[Delete]}" delete-char
+bindkey -- "${keys[Ctrl+Delete]}" delete-char
+
+# Home/End: https://stackoverflow.com/a/8645267/1973105
+bindkey -- "${keys[Home]}" beginning-of-line # Fn + Left arrow
+bindkey -- "${keys[End]}" end-of-line # Fn + Right arrow
+
+# Erase whole line
+bindkey "${keys[Ctrl+K]}" kill-whole-line
+
+# History search with Up/Down keys. It uses the whole line to search
+# Credits to https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey -- "${keys[Up]}" up-line-or-beginning-search
+bindkey -- "${keys[Down]}" down-line-or-beginning-search
+
+# Directory history
+bindkey '^[[1;6A' directory-history-search-backward
+bindkey '^[[1;6B' directory-history-search-forward
+# CWD history
+bindkey '^X^G' cwd-history-toggle
+
+# Insert "sudo" at the beginning of line with Esc+Esc key
+zle -N sudo-command-line
+sudo-command-line() {
+  if [[ $BUFFER == sudo\ * ]]; then
+    LBUFFER="${LBUFFER#sudo }"
+  else
+    LBUFFER="sudo $LBUFFER"
+  fi
+}
+bindkey "${keys[Escape]}${keys[Escape]}" sudo-command-line
